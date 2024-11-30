@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"igiag"
+	],
+	"copyright": "Copyright © 2024, igiag",
+	"description": "A minimal D application.",
+	"license": "proprietary",
+	"name": "minax"
+}
