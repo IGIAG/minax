@@ -2,7 +2,7 @@ import std.stdio;
 import std.format;
 import std.algorithm.mutation : reverse;
 import std.algorithm;
-
+import std.array;
 import std.container;
 import std.range;
 
@@ -25,19 +25,19 @@ void main()
 	];
 	SimpleImplicantValue[][] simple_implicants = [];
 	int it = 0;
-	while(F.length > 0){
+	while(F.length > 0 && it < 200){
 
 		uint cube = F[0];
 		uint[] block_matrix = generate_block_matrix(cube,R);
 		SimpleImplicantValue[] cubes_simple_implicant = get_simple_implicant(cube,block_matrix,uint.max);
 		simple_implicants ~= cubes_simple_implicant;
 		auto F_cut = Array!uint(F);
-		writefln("For implicant %s:",cubes_simple_implicant);
+		//writefln("For implicant %s:",cubes_simple_implicant);
 		foreach (uint row; F)
 		{
 			if(value_matches_simple_implicant(row,cubes_simple_implicant)){
 				auto range = F_cut[];
-				writefln("Would remove: %s",row);
+				//writefln("Would remove: %s",row);
 				auto found = range.find(row);
 				F_cut.linearRemove(found.take(1));
 			}
@@ -45,8 +45,34 @@ void main()
 		F = F_cut.data;
 		it++;
 	}
-	writefln("%s",simple_implicants);
+	if(it == 200){
+		writeln("COŚ POSZŁO BARDZO NIE TAK! (Przekroczono 200 iteracji w głównej pętli)");
+	}
+	string[] stringed_simple_implicants = [];
+	foreach (SimpleImplicantValue[] simple_implicant; simple_implicants)
+	{
+		stringed_simple_implicants ~= simple_implicant_to_string(simple_implicant,column_names);
+	}
+	writefln("%s",stringed_simple_implicants.join(" + "));
 }
+
+string simple_implicant_to_string(SimpleImplicantValue[] simple_implicant,char[] column_names){
+	simple_implicant = simple_implicant;
+	int shift = cast(int)column_names.length - 1;
+	string returnable = "";
+	foreach (simple_implicant_bit; simple_implicant)
+	{
+		//writefln("Converting %s for column name %s",simple_implicant_bit,column_names[shift]);
+		if(simple_implicant_bit != SimpleImplicantValue.DONT_CARE){
+			returnable ~= (simple_implicant_bit == SimpleImplicantValue.TRUE) ? format("%s",column_names[shift]) :format("%s'",column_names[shift]) ;
+		}
+		
+		shift--;
+	}
+	return returnable;
+}
+
+
 bool value_matches_simple_implicant(uint value,SimpleImplicantValue[] simple_implicant){
 	int shift = 0;
 	foreach (SimpleImplicantValue simple_implicant_bit; simple_implicant)
