@@ -1,6 +1,11 @@
 import std.stdio;
 import std.format;
 import std.algorithm.mutation : reverse;
+import std.algorithm;
+
+import std.container;
+import std.range;
+
 void main()
 {
 	char[] column_names = ['A','B','C','D'];
@@ -18,13 +23,41 @@ void main()
 		0b0001,
 		0b0111
 	];
-	foreach (uint cube; F)
-	{
+	SimpleImplicantValue[][] simple_implicants = [];
+	int it = 0;
+	while(F.length > 0){
+
+		uint cube = F[0];
 		uint[] block_matrix = generate_block_matrix(cube,R);
-		writeln(get_simple_implicant_string(cube,block_matrix,column_names));
+		SimpleImplicantValue[] cubes_simple_implicant = get_simple_implicant(cube,block_matrix,uint.max);
+		simple_implicants ~= cubes_simple_implicant;
+		auto F_cut = Array!uint(F);
+		writefln("For implicant %s:",cubes_simple_implicant);
+		foreach (uint row; F)
+		{
+			if(value_matches_simple_implicant(row,cubes_simple_implicant)){
+				auto range = F_cut[];
+				writefln("Would remove: %s",row);
+				auto found = range.find(row);
+				F_cut.linearRemove(found.take(1));
+			}
+		}
+		F = F_cut.data;
+		it++;
 	}
-	
-	
+	writefln("%s",simple_implicants);
+}
+bool value_matches_simple_implicant(uint value,SimpleImplicantValue[] simple_implicant){
+	int shift = 0;
+	foreach (SimpleImplicantValue simple_implicant_bit; simple_implicant)
+	{
+		uint bit = (value >> shift) & 0b1;
+		if(simple_implicant_bit == SimpleImplicantValue.TRUE && bit == 0){return false;}
+		if(simple_implicant_bit == SimpleImplicantValue.FALSE && bit == 1){return false;}
+		shift++;
+	}
+
+	return true;	
 }
 
 uint[] generate_block_matrix(uint cube,uint[] R){
@@ -35,9 +68,15 @@ uint[] generate_block_matrix(uint cube,uint[] R){
 	return block_matrix;
 }
 
-char[] get_simple_implicant_string(uint cube,uint[] block_matrix,char[] column_names){
+enum SimpleImplicantValue {
+	TRUE,
+	FALSE,
+	DONT_CARE
+}
+
+SimpleImplicantValue[] get_simple_implicant(uint cube,uint[] block_matrix,uint max_value){
 	uint mask = 0;
-	while (mask < 9){
+	while (mask < max_value){
 		uint[] matrix = block_matrix.dup;
 		//writefln("Testing mask %b",mask);
 		for(int i = 0;i < matrix.length;i++){
@@ -51,24 +90,24 @@ char[] get_simple_implicant_string(uint cube,uint[] block_matrix,char[] column_n
 			sum = matrix[i] & sum;
 		}
 		if (sum > 0){
-			writefln("Found implicant %b",mask);
-			string product = "";
+			//writefln("Found implicant %b",mask);
+			SimpleImplicantValue[] product = [];
 			uint cube_mod = cube;
 			uint i = 0;
 			while(mask > 0){
 				uint mask_bit_value = mask & 0b1;
 				if(mask_bit_value == 0){
-					//product ~= '*';
+					product ~= SimpleImplicantValue.DONT_CARE;
 				}
 				else {
 					//product ~= (cube_mod & 0b1) == 1 ? '1' : '0';
-					product ~= (cube_mod & 0b1) == 1 ? format("%s",column_names[column_names.length - i - 1]) : format("'%s",column_names[column_names.length - i - 1]);
+					product ~= (cube_mod & 0b1) == 1 ? SimpleImplicantValue.TRUE : SimpleImplicantValue.FALSE;
 				}
 				cube_mod = cube_mod >> 1;
 				mask = mask >> 1;
 				i++;
 			}
-			return (cast(char[])product).reverse;
+			return product;
 		}
 		mask++;
 	}
