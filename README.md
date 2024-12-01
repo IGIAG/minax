@@ -9,7 +9,7 @@
 2. Aby załadować z pliku należy użyć odpowiedniego formatu. Przykładowy plik znajduje się w repozytorium pod nazwą `testfile.txt`.
     - każda sekcja jest oddzielona pustym wierszem
     - pierwsza linijka pliku wybiera tryb należy tam wpisać `BINARY` lub `DECIMAL` (w trybie decimal podajemy nr. wierszów)
-    - drógi wiersz definiuje nazwy parametrów (kolumn)
+    - drugi wiersz definiuje nazwy parametrów (kolumn)
     - następna sekcja definiuje zbiór F (on-set), czyli kombinacje parametrów gdzie funkcja zwraca `1`
     - ostatnia sekcja definiuje zbiór R (off-set), czyli kombinacje gdzie funkcja zwraca `0`.
     - Aby wczytać plik, podaj jego ścieżkę w parametrze. Przykład:
