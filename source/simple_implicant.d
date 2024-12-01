@@ -23,7 +23,6 @@ string simple_implicant_to_string(SimpleImplicantValue[] simple_implicant,char[]
 	string returnable = "";
 	foreach (simple_implicant_bit; simple_implicant)
 	{
-		//writefln("Converting %s for column name %s",simple_implicant_bit,column_names[shift]);
 		if(simple_implicant_bit != SimpleImplicantValue.DONT_CARE){
 			returnable ~= (simple_implicant_bit == SimpleImplicantValue.TRUE) ? format("%s",column_names[shift]) :format("%s'",column_names[shift]) ;
 		}
@@ -47,11 +46,14 @@ bool value_matches_simple_implicant(uint value,SimpleImplicantValue[] simple_imp
 	return true;	
 }
 
+/*
+W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
+*/
+
 SimpleImplicantValue[] get_simple_implicant(uint cube,uint[] block_matrix,uint max_value){
 	uint mask = 0;
 	while (mask < max_value){
 		uint[] matrix = block_matrix.dup;
-		//writefln("Testing mask %b",mask);
 		for(int i = 0;i < matrix.length;i++){
 			matrix[i] = matrix[i] & mask;
 		}
@@ -63,7 +65,6 @@ SimpleImplicantValue[] get_simple_implicant(uint cube,uint[] block_matrix,uint m
 			sum = matrix[i] & sum;
 		}
 		if (sum > 0){
-			//writefln("Found implicant %b",mask);
 			SimpleImplicantValue[] product = [];
 			uint cube_mod = cube;
 			uint i = 0;
@@ -73,7 +74,6 @@ SimpleImplicantValue[] get_simple_implicant(uint cube,uint[] block_matrix,uint m
 					product ~= SimpleImplicantValue.DONT_CARE;
 				}
 				else {
-					//product ~= (cube_mod & 0b1) == 1 ? '1' : '0';
 					product ~= (cube_mod & 0b1) == 1 ? SimpleImplicantValue.TRUE : SimpleImplicantValue.FALSE;
 				}
 				cube_mod = cube_mod >> 1;
@@ -86,6 +86,8 @@ SimpleImplicantValue[] get_simple_implicant(uint cube,uint[] block_matrix,uint m
 	}
 	return [];
 }
+
+
 
 uint[] remove_values_matching_simple_implicant(uint[] source,SimpleImplicantValue[] simple_implicant){
     auto F_cut = Array!uint(source);
