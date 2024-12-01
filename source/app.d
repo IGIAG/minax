@@ -24,7 +24,7 @@ void main(string[] args)
 
 	SimpleImplicantValue[][] simple_implicants = [];
 	int iteration = 0;
-	while (F.length > 0 && iteration < 10000)
+	while (F.length > 0 && iteration < 10_000)
 	{
 		uint cube = F[0];
 		uint[] block_matrix = generate_block_matrix(cube, R);
@@ -41,7 +41,7 @@ void main(string[] args)
 		}
 		iteration++;
 	}
-	if (iteration == 10000)
+	if (iteration == 10_000)
 	{
 		writeln("Przekroczono 10000 iteracji w głównej pętli");
 		return;
