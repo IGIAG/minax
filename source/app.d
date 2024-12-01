@@ -7,6 +7,7 @@ import input_output;
 
 void main(string[] args)
 {
+	writeln(import("intro.txt"));
 	auto rnd = MinstdRand0(42);
 	char[] column_names = [];
 	uint[] F = [];
@@ -17,6 +18,7 @@ void main(string[] args)
 	}
 	else
 	{
+		writefln("Odczytywanie z pliku: %s\n",args[1]);
 		input_output.read_from_file(args[1], column_names, F, R);
 	}
 
@@ -49,5 +51,5 @@ void main(string[] args)
 	{
 		stringed_simple_implicants ~= simple_implicant_to_string(simple_implicant, column_names);
 	}
-	writefln("%s", stringed_simple_implicants.join(" + "));
+	writefln("Uproszczone wyrazenie booleowskie: %s", stringed_simple_implicants.join(" + "));
 }
