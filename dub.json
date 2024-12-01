@@ -1,10 +1,10 @@
 {
 	"authors": [
-		"igiag"
+		"Krzysztof Kubicz"
 	],
 	"copyright": "Copyright © 2024, igiag",
-	"description": "A minimal D application.",
-	"license": "proprietary",
+	"description": "Program do minimalizacji funkcji booleowskich",
+	"license": "CC BY-SA 4.0",
 	"name": "minax",
 	"stringImportPaths": [
 		"views"

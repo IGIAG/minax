@@ -14,3 +14,4 @@ minax-test-*
 *.o
 *.obj
 *.lst
+/binaries
