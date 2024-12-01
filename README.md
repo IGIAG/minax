@@ -36,5 +36,16 @@
 3. Aby wczytać dane z wejścia standardowego, niepodawaj parametru.
 
 ## Ograniczenia:
-    - Maksymalna ilość parametrów: 32
-    - Użycie metody heurystycznej, uzyskane wyrażenie nie musi być w 100% optymalne.
+
+- Maksymalna ilość parametrów: 32
+- Użycie metody heurystycznej, uzyskane wyrażenie nie musi być w 100% optymalne.
+## Gotowe binarki:
+- Gotowe binarki są dostępne [tutaj](https://github.com/IGIAG/minax/releases/tag/binarki)
+## Kompilacja:
+
+Wymagania:
+-   Program DUB [https://github.com/dlang/dub](https://github.com/dlang/dub)
+
+Proces:
+- W katalogu projektu należy wykonać komendę `dub build`, a plik wykonywalny dla
+twojej platformy pojawi się w tym samym katalogu.
