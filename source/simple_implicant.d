@@ -72,7 +72,6 @@ SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint
         best_mask = best_mask << 1;
         best_mask++;
     }
-    writefln("%b",best_mask);
     while (mask < max_value)
     {
         uint[] matrix = block_matrix.dup;
