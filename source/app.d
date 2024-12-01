@@ -39,7 +39,6 @@ void main(string[] args)
 			F = F.randomShuffle(); //if couldn't find simple implicant for cube, shuffle array to get better cube at the begining
 		}
 		iteration++;
-		writeln(iteration);
 	}
 	if (iteration == uint.max)
 	{
