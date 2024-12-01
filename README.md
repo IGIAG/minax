@@ -34,3 +34,7 @@
         | 1 | 0 | 1 |
         | 1 | 1 | 0 |
 3. Aby wczytać dane z wejścia standardowego, niepodawaj parametru.
+
+## Ograniczenia:
+    - Maksymalna ilość parametrów: 32
+    - Użycie metody heurystycznej, uzyskane wyrażenie nie musi być w 100% optymalne.
