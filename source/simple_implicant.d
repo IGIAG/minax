@@ -9,6 +9,7 @@ import std.algorithm;
 import std.array;
 import std.container;
 import std.range;
+import core.bitop;
 
 enum SimpleImplicantValue
 {
@@ -62,6 +63,8 @@ W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value)
 {
     uint mask = 0;
+    uint best_mask = uint.max;
+    uint best_mask_column_count = 32;
     while (mask < max_value)
     {
         uint[] matrix = block_matrix.dup;
@@ -80,30 +83,34 @@ SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint
         }
         if (sum > 0)
         {
-            SimpleImplicantValue[] product = [];
-            uint cube_mod = cube;
-            uint i = 0;
-            while (mask > 0)
+            if (popcnt(mask) < best_mask_column_count)
             {
-                uint mask_bit_value = mask & 0b1;
-                if (mask_bit_value == 0)
-                {
-                    product ~= SimpleImplicantValue.DONT_CARE;
-                }
-                else
-                {
-                    product ~= (cube_mod & 0b1) == 1 ? SimpleImplicantValue.TRUE
-                        : SimpleImplicantValue.FALSE;
-                }
-                cube_mod = cube_mod >> 1;
-                mask = mask >> 1;
-                i++;
+                best_mask = mask;
+                best_mask_column_count = popcnt(mask);
             }
-            return product;
+
         }
         mask++;
     }
-    return [];
+    SimpleImplicantValue[] product = [];
+    uint i = 0;
+    while (best_mask > 0)
+    {
+        uint mask_bit_value = best_mask & 0b1;
+        if (mask_bit_value == 0)
+        {
+            product ~= SimpleImplicantValue.DONT_CARE;
+        }
+        else
+        {
+            product ~= (cube & 0b1) == 1 ? SimpleImplicantValue.TRUE
+                : SimpleImplicantValue.FALSE;
+        }
+        cube = cube >> 1;
+        best_mask = best_mask >> 1;
+        i++;
+    }
+    return product;
 }
 
 uint[] remove_values_matching_simple_implicant(uint[] source, SimpleImplicantValue[] simple_implicant)
