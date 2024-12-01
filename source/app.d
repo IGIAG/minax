@@ -8,7 +8,6 @@ import input_output;
 void main(string[] args)
 {
 	writeln(import("intro.txt"));
-	auto rnd = MinstdRand0(42);
 	char[] column_names = [];
 	uint[] F = [];
 	uint[] R = [];
@@ -23,8 +22,8 @@ void main(string[] args)
 	}
 
 	SimpleImplicantValue[][] simple_implicants = [];
-	int iteration = 0;
-	while (F.length > 0 && iteration < 10_000)
+	uint iteration = 0;
+	while (F.length > 0 && iteration < uint.max)
 	{
 		uint cube = F[0];
 		uint[] block_matrix = generate_block_matrix(cube, R);
@@ -37,13 +36,14 @@ void main(string[] args)
 		}
 		catch (Exception e)
 		{
-			F = F.randomShuffle(rnd); //if couldn't find simple implicant for cube, shuffle array to get better cube at the begining
+			F = F.randomShuffle(); //if couldn't find simple implicant for cube, shuffle array to get better cube at the begining
 		}
 		iteration++;
+		writeln(iteration);
 	}
-	if (iteration == 10_000)
+	if (iteration == uint.max)
 	{
-		writeln("Przekroczono 10000 iteracji w głównej pętli");
+		writeln("Przekroczono limit iteracji w głównej pętli");
 		return;
 	}
 	string[] stringed_simple_implicants = [];

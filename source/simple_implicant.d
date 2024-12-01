@@ -66,8 +66,13 @@ W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value,char[] column_names)
 {
     uint mask = 0;
-    uint best_mask = uint.max;
-    uint best_mask_column_count = 32;
+    uint best_mask = 0;
+    uint best_mask_column_count = cast(uint)column_names.length;
+    for(int i = 0;i < best_mask_column_count;i++){
+        best_mask = best_mask << 1;
+        best_mask++;
+    }
+    writefln("%b",best_mask);
     while (mask < max_value)
     {
         uint[] matrix = block_matrix.dup;
