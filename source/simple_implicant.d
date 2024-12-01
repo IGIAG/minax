@@ -23,6 +23,9 @@ string simple_implicant_to_string(SimpleImplicantValue[] simple_implicant, char[
     simple_implicant = simple_implicant;
     int shift = cast(int) column_names.length - 1;
     string returnable = "";
+    if(simple_implicant.length > column_names.length){
+        throw new Exception("SIMPLE IMPLICANT LONGER THAN COLUMN NAMES!!!");
+    }
     foreach (simple_implicant_bit; simple_implicant)
     {
         if (simple_implicant_bit != SimpleImplicantValue.DONT_CARE)
@@ -60,7 +63,7 @@ bool value_matches_simple_implicant(uint value, SimpleImplicantValue[] simple_im
 W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 */
 
-SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value)
+SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value,char[] column_names)
 {
     uint mask = 0;
     uint best_mask = uint.max;
@@ -109,6 +112,9 @@ SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint
         cube = cube >> 1;
         best_mask = best_mask >> 1;
         i++;
+    }
+    if(product.length > column_names.length){
+        throw new Exception("No simple implicants found!");
     }
     return product;
 }

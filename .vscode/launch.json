@@ -10,7 +10,8 @@
             "dubBuild": true,
             "name": "Build & Debug DUB project",
             "cwd": "${command:dubWorkingDirectory}",
-            "program": "${command:dubTarget}"
+            "program": "${command:dubTarget}",
+            "args": ["testfile.txt"]
         }
     ]
 }
