@@ -34,9 +34,6 @@ void main(string[] args)
 					int)(column_names.length * column_names.length), column_names);
 			simple_implicants ~= cubes_simple_implicant;
 			F = simple_implicant.remove_values_matching_simple_implicant(F, cubes_simple_implicant);
-			if(cubes_simple_implicant == last_cubes_simple_implicant){
-				writeln("HUHH?");
-			}
 			last_cubes_simple_implicant = cubes_simple_implicant;
 		}
 		catch (Exception e)
