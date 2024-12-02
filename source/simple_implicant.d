@@ -17,7 +17,7 @@ enum SimpleImplicantValue
     FALSE,
     DONT_CARE
 }
-
+@safe
 string simple_implicant_to_string(SimpleImplicantValue[] simple_implicant, char[] column_names)
 {
     simple_implicant = simple_implicant;
@@ -38,7 +38,7 @@ string simple_implicant_to_string(SimpleImplicantValue[] simple_implicant, char[
     }
     return returnable;
 }
-
+@safe
 bool value_matches_simple_implicant(uint value, SimpleImplicantValue[] simple_implicant)
 {
     int shift = 0;
@@ -62,7 +62,7 @@ bool value_matches_simple_implicant(uint value, SimpleImplicantValue[] simple_im
 /*
 W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 */
-
+@safe
 SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value,char[] column_names)
 {
     uint mask = 0;
@@ -81,7 +81,7 @@ SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint
         }
         for (int i = 0; i < matrix.length; i++)
         {
-            matrix[i] = (matrix[i] > 0) ? 1 : 0;
+            matrix[i] = matrix[i] > 0;
         }
         uint sum = matrix[0];
         for (int i = 1; i < matrix.length; i++)
@@ -122,18 +122,15 @@ SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint
     }
     return product;
 }
-
 uint[] remove_values_matching_simple_implicant(uint[] source, SimpleImplicantValue[] simple_implicant)
 {
-    auto F_cut = Array!uint(source);
+    uint[] cut = [];
     foreach (uint row; source)
     {
-        if (value_matches_simple_implicant(row, simple_implicant))
+        if (!value_matches_simple_implicant(row, simple_implicant))
         {
-            auto range = F_cut[];
-            auto found = range.find(row);
-            F_cut.linearRemove(found.take(1));
+            cut ~= row;
         }
     }
-    return F_cut.data;
+    return cut;
 }
