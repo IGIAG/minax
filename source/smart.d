@@ -18,28 +18,21 @@ struct Record {
 
 SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
 {
-    SimpleImplicant[] returnable;
     SimpleImplicant[uint] coverage_map;
+    SimpleImplicant best;
+    uint best_coverage = 0;
     foreach (uint cube; F)
     {
         SimpleImplicant[] implicants = get_simple_implicant(cube, generate_block_matrix(cube, R), 2 << column_names.length, column_names);
         foreach (SimpleImplicant implicant; implicants)
         {
             uint coverage = cast(uint)(F.length - remove_values_matching_simple_implicant(F.dup,implicant).length);
-            coverage_map[coverage] = implicant;
+            if (coverage > best_coverage) {
+                best = implicant;
+                best_coverage = coverage;
+            }
         }
     }
-    SimpleImplicant best;
-    uint best_coverage = 0;
-
-    foreach (key; coverage_map.keys)
-    {
-        if(key > best_coverage){
-            best = coverage_map[key];
-            best_coverage = key;
-        }
-    }
-    writeln(coverage_map);
     if(F.length == 0){
         return [];
     }
