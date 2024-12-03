@@ -8,6 +8,8 @@ import core.bitop : popcnt;
 
 import std.stdio;
 
+import std.random;
+
 SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
 {
     if (F.length == 0)
@@ -24,7 +26,7 @@ SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
     uint[] zero_matrix = generate_block_matrix(F[0], R);
     SimpleImplicant best = get_simple_implicant(F[0], zero_matrix, cast(int)(
             column_names.length * column_names.length), column_names)[0];
-    uint best_coverage = 0;
+    uint best_coverage = uint.max;
     foreach (uint k; F)
     {
 
@@ -36,7 +38,7 @@ SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
         }
         SimpleImplicant implicant = new_implicants[0];
         uint coverage = cast(uint) remove_values_matching_simple_implicant(F.dup, implicant).length;
-        if (coverage > best_coverage)
+        if (coverage < best_coverage)
         {
             best = implicant;
             best_coverage = coverage;

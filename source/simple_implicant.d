@@ -88,7 +88,7 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
         best_mask = best_mask << 1;
         best_mask++;
     }
-    while (mask < max_value)
+    while (mask <= max_value)
     {
         uint[] matrix = block_matrix.dup;
         for (int i = 0; i < matrix.length; i++)
