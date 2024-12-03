@@ -22,7 +22,7 @@ struct SimpleImplicant {
     uint cube;
     uint mask;
     bool matches_value(uint v){
-        return (cube ^ mask) == (v ^ mask);
+        return (cube & mask) == (v & mask);
     }
 }
 
@@ -30,20 +30,25 @@ struct SimpleImplicant {
 string simple_implicant_to_string(SimpleImplicant _simple_implicant, char[] column_names)
 {
     string returnable = "";
-    uint shift = cast(int)column_names.length;
-    while(shift > 0){
-        shift--;
-        if((_simple_implicant.mask >> shift) % 2 == 0){
+    char[] r_column_names = column_names.dup.reverse();
+    uint shiftR = 0;
+    while(shiftR < r_column_names.length){
+        if((_simple_implicant.mask >> shiftR) % 2 == 0){
+            shiftR++;
             continue;
         }
-        if((_simple_implicant.cube >> shift) % 2 == 0){
-            returnable ~= column_names[shift];
+        if((_simple_implicant.cube >> shiftR) % 2 == 0){
+            returnable ~= r_column_names[shiftR] ~ "'";
         }
         else {
-            returnable ~= format("%s'",column_names[shift]);
+            returnable ~= r_column_names[shiftR];
         }
         
+        
+        shiftR++;
     }
+
+    
     return returnable;
 }
 @safe
@@ -71,11 +76,14 @@ bool value_matches_simple_implicant(uint value, SimpleImplicantValue[] simple_im
 W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 */
 @safe
-SimpleImplicant get_simple_implicant(uint cube, uint[] block_matrix, uint max_value,char[] column_names)
+SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value,char[] column_names)
 {
     uint mask = 0;
     uint best_mask = 0;
     uint best_mask_column_count = cast(uint)column_names.length;
+
+    SimpleImplicant[][] simple_implicant_ranks = new SimpleImplicant[][0b1 <<column_names.length];
+
     for(int i = 0;i < best_mask_column_count;i++){
         best_mask = best_mask << 1;
         best_mask++;
@@ -98,16 +106,26 @@ SimpleImplicant get_simple_implicant(uint cube, uint[] block_matrix, uint max_va
         }
         if (sum > 0)
         {
-            if (popcnt(mask) < best_mask_column_count)
-            {
-                best_mask = mask;
-                best_mask_column_count = popcnt(mask);
-            }
-
+            
+            simple_implicant_ranks[popcnt(mask)] ~= SimpleImplicant(cube,mask);
+            
         }
         mask++;
     }
-    return SimpleImplicant(cube,best_mask);
+    SimpleImplicant[] returnable = [];
+    foreach (SimpleImplicant[] rank; simple_implicant_ranks)
+    {
+        if(rank.length != 0){
+            //rank = rank.reverse;
+            foreach (SimpleImplicant implicant; rank)
+            {
+                returnable ~= implicant;
+            }
+            break;    
+        }
+        
+    }
+    return returnable;
 }
 uint[] remove_values_matching_simple_implicant(uint[] source, SimpleImplicant simple_implicant)
 {
