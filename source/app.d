@@ -21,7 +21,7 @@ void main(string[] args)
 		input_output.read_from_file(args[1], column_names, F, R);
 	}
 
-	SimpleImplicantValue[][] simple_implicants = [];
+	SimpleImplicant[] simple_implicants = [];
 	uint iteration = 0;
 	while (F.length > 0 && iteration < uint.max)
 	{
@@ -29,7 +29,7 @@ void main(string[] args)
 		uint[] block_matrix = generate_block_matrix(cube, R);
 		try
 		{
-			SimpleImplicantValue[] cubes_simple_implicant = get_simple_implicant(cube, block_matrix, cast(
+			SimpleImplicant cubes_simple_implicant = get_simple_implicant(cube, block_matrix, cast(
 					int)(column_names.length * column_names.length), column_names);
 			simple_implicants ~= cubes_simple_implicant;
 			F = simple_implicant.remove_values_matching_simple_implicant(F, cubes_simple_implicant);
@@ -46,7 +46,7 @@ void main(string[] args)
 		return;
 	}
 	string[] stringed_simple_implicants = [];
-	foreach (SimpleImplicantValue[] simple_implicant; simple_implicants)
+	foreach (SimpleImplicant simple_implicant; simple_implicants)
 	{
 		stringed_simple_implicants ~= simple_implicant_to_string(simple_implicant, column_names);
 	}
