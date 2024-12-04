@@ -17,25 +17,38 @@ enum SimpleImplicantValue
     FALSE,
     DONT_CARE
 }
-@safe
-string simple_implicant_to_string(SimpleImplicantValue[] simple_implicant, char[] column_names)
-{
-    simple_implicant = simple_implicant;
-    int shift = cast(int) column_names.length - 1;
-    string returnable = "";
-    if(simple_implicant.length > column_names.length){
-        throw new Exception("SIMPLE IMPLICANT LONGER THAN COLUMN NAMES!!!");
-    }
-    foreach (simple_implicant_bit; simple_implicant)
-    {
-        if (simple_implicant_bit != SimpleImplicantValue.DONT_CARE)
-        {
-            returnable ~= (simple_implicant_bit == SimpleImplicantValue.TRUE) ? format("%s", column_names[shift])
-                : format("%s'", column_names[shift]);
-        }
 
-        shift--;
+struct SimpleImplicant {
+    uint cube;
+    uint mask;
+    bool matches_value(uint v){
+        return (cube & mask) == (v & mask);
     }
+}
+
+@safe
+string simple_implicant_to_string(SimpleImplicant _simple_implicant, char[] column_names)
+{
+    string returnable = "";
+    char[] r_column_names = column_names.dup.reverse();
+    uint shiftR = 0;
+    while(shiftR < r_column_names.length){
+        if((_simple_implicant.mask >> shiftR) % 2 == 0){
+            shiftR++;
+            continue;
+        }
+        if((_simple_implicant.cube >> shiftR) % 2 == 0){
+            returnable ~= r_column_names[shiftR] ~ "'";
+        }
+        else {
+            returnable ~= r_column_names[shiftR];
+        }
+        
+        
+        shiftR++;
+    }
+
+    
     return returnable;
 }
 @safe
@@ -63,16 +76,24 @@ bool value_matches_simple_implicant(uint value, SimpleImplicantValue[] simple_im
 W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 */
 @safe
-SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value,char[] column_names)
+SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value,char[] column_names)
 {
     uint mask = 0;
     uint best_mask = 0;
     uint best_mask_column_count = cast(uint)column_names.length;
+    max_value = 1;
+    for(int i = 0;i < column_names.length;i++){
+        max_value = max_value << 1;
+        max_value += 1;
+    }
+
+    SimpleImplicant[][] simple_implicant_ranks = new SimpleImplicant[][0b1 <<column_names.length];
+
     for(int i = 0;i < best_mask_column_count;i++){
         best_mask = best_mask << 1;
         best_mask++;
     }
-    while (mask < max_value)
+    while (mask <= max_value)
     {
         uint[] matrix = block_matrix.dup;
         for (int i = 0; i < matrix.length; i++)
@@ -90,44 +111,34 @@ SimpleImplicantValue[] get_simple_implicant(uint cube, uint[] block_matrix, uint
         }
         if (sum > 0)
         {
-            if (popcnt(mask) < best_mask_column_count)
-            {
-                best_mask = mask;
-                best_mask_column_count = popcnt(mask);
-            }
-
+            
+            simple_implicant_ranks[popcnt(mask)] ~= SimpleImplicant(cube,mask);
+            
         }
         mask++;
     }
-    SimpleImplicantValue[] product = [];
-    uint i = 0;
-    while (best_mask > 0)
+    SimpleImplicant[] returnable = [];
+    foreach (SimpleImplicant[] rank; simple_implicant_ranks)
     {
-        uint mask_bit_value = best_mask & 0b1;
-        if (mask_bit_value == 0)
-        {
-            product ~= SimpleImplicantValue.DONT_CARE;
+        if(rank.length != 0){
+            //rank = rank.reverse;
+            foreach (SimpleImplicant implicant; rank)
+            {
+                returnable ~= implicant;
+            }
+            break;    
         }
-        else
-        {
-            product ~= (cube & 0b1) == 1 ? SimpleImplicantValue.TRUE
-                : SimpleImplicantValue.FALSE;
-        }
-        cube = cube >> 1;
-        best_mask = best_mask >> 1;
-        i++;
+        
     }
-    if(product.length > column_names.length){
-        throw new Exception("No simple implicants found!");
-    }
-    return product;
+    assert(returnable.length > 0);
+    return returnable;
 }
-uint[] remove_values_matching_simple_implicant(uint[] source, SimpleImplicantValue[] simple_implicant)
+uint[] remove_values_matching_simple_implicant(uint[] source, SimpleImplicant simple_implicant)
 {
     uint[] cut = [];
     foreach (uint row; source)
     {
-        if (!value_matches_simple_implicant(row, simple_implicant))
+        if (!simple_implicant.matches_value(row))
         {
             cut ~= row;
         }

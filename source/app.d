@@ -2,8 +2,10 @@ import std.stdio;
 import std.range;
 import simple_implicant;
 import block_matrix;
-import std.random;
 import input_output;
+import heuristic;
+
+import smart;
 
 void main(string[] args)
 {
@@ -20,35 +22,20 @@ void main(string[] args)
 		writefln("Odczytywanie z pliku: %s\n",args[1]);
 		input_output.read_from_file(args[1], column_names, F, R);
 	}
-
-	SimpleImplicantValue[][] simple_implicants = [];
-	uint iteration = 0;
-	while (F.length > 0 && iteration < uint.max)
-	{
-		uint cube = F[0];
-		uint[] block_matrix = generate_block_matrix(cube, R);
-		try
-		{
-			SimpleImplicantValue[] cubes_simple_implicant = get_simple_implicant(cube, block_matrix, cast(
-					int)(column_names.length * column_names.length), column_names);
-			simple_implicants ~= cubes_simple_implicant;
-			F = simple_implicant.remove_values_matching_simple_implicant(F, cubes_simple_implicant);
-		}
-		catch (Exception e)
-		{
-			F = F.randomShuffle(); //if couldn't find simple implicant for cube, shuffle array to get better cube at the begining
-		}
-		iteration++;
-	}
-	if (iteration == uint.max)
-	{
-		writeln("Przekroczono limit iteracji w głównej pętli");
-		return;
-	}
+	//SimpleImplicant[] smart_simple_implicants = smart.smart_method(F.dup,R.dup,column_names.dup);
+	SimpleImplicant[] simple_implicants = heuristic.heuristic_method(F,R,column_names);
+	
+	
 	string[] stringed_simple_implicants = [];
-	foreach (SimpleImplicantValue[] simple_implicant; simple_implicants)
+	foreach (SimpleImplicant simple_implicant; simple_implicants)
 	{
 		stringed_simple_implicants ~= simple_implicant_to_string(simple_implicant, column_names);
 	}
-	writefln("Uproszczone wyrazenie booleowskie: %s", stringed_simple_implicants.join(" + "));
+	string[] stringed_smart_simple_implicants = [];
+	/*foreach (SimpleImplicant simple_implicant; smart_simple_implicants)
+	{
+		stringed_smart_simple_implicants ~= simple_implicant_to_string(simple_implicant, column_names);
+	}*/
+	writefln("Uproszczone wyrazenie booleowskie (h): %s", stringed_simple_implicants.join(" + "));
+	//writefln("Uproszczone wyrazenie booleowskie (s): %s", stringed_smart_simple_implicants.join(" + "));
 }
