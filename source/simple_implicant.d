@@ -81,6 +81,11 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
     uint mask = 0;
     uint best_mask = 0;
     uint best_mask_column_count = cast(uint)column_names.length;
+    max_value = 1;
+    for(int i = 0;i < column_names.length;i++){
+        max_value = max_value << 1;
+        max_value += 1;
+    }
 
     SimpleImplicant[][] simple_implicant_ranks = new SimpleImplicant[][0b1 <<column_names.length];
 
@@ -125,6 +130,7 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
         }
         
     }
+    assert(returnable.length > 0);
     return returnable;
 }
 uint[] remove_values_matching_simple_implicant(uint[] source, SimpleImplicant simple_implicant)
