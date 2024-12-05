@@ -25,8 +25,15 @@ struct SimpleImplicant {
         return (cube & mask) == (v & mask);
     }
 }
+string simple_implicant_to_string(SimpleImplicant[] simple_implicants,char[] column_names){
+    string[] stringed_simple_implicants = [];
+	foreach (SimpleImplicant simple_implicant; simple_implicants)
+	{
+		stringed_simple_implicants ~= simple_implicant_to_string(simple_implicant, column_names);
+	}
+	return stringed_simple_implicants.join(" + ");
+}
 
-@safe
 string simple_implicant_to_string(SimpleImplicant _simple_implicant, char[] column_names)
 {
     string returnable = "";
@@ -51,7 +58,7 @@ string simple_implicant_to_string(SimpleImplicant _simple_implicant, char[] colu
     
     return returnable;
 }
-@safe
+
 bool value_matches_simple_implicant(uint value, SimpleImplicantValue[] simple_implicant)
 {
     int shift = 0;
@@ -72,10 +79,11 @@ bool value_matches_simple_implicant(uint value, SimpleImplicantValue[] simple_im
     return true;
 }
 
+
 /*
 W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 */
-@safe
+
 SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value,char[] column_names)
 {
     uint mask = 0;
@@ -104,7 +112,7 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
         {
             matrix[i] = matrix[i] > 0;
         }
-        uint sum = matrix[0];
+        uint sum = matrix.length > 0 ? matrix[0] : 0;
         for (int i = 1; i < matrix.length; i++)
         {
             sum = matrix[i] & sum;

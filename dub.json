@@ -3,6 +3,9 @@
 		"Krzysztof Kubicz"
 	],
 	"copyright": "Copyright © 2024, igiag",
+	"dependencies": {
+		"darg": "~>0.1.0"
+	},
 	"description": "Program do minimalizacji funkcji booleowskich",
 	"license": "CC BY-SA 4.0",
 	"name": "minax",

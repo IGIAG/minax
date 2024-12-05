@@ -1,5 +1,7 @@
 {
 	"fileVersion": 1,
 	"versions": {
+		"darg": "0.1.0",
+		"jcli": "0.24.0"
 	}
 }

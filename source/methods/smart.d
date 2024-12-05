@@ -1,4 +1,4 @@
-module smart;
+module methods.smart;
 
 import simple_implicant;
 

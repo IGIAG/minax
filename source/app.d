@@ -3,39 +3,78 @@ import std.range;
 import simple_implicant;
 import block_matrix;
 import input_output;
-import heuristic;
+import methods.heuristic;
+import methods.smart;
+import methods.none;
+import darg;
 
-import smart;
+struct Options
+{
+    @Option("help", "h")
+    @Help("Wyświetla tę wiadomość")
+    OptionFlag help;
+
+    @Argument("file",Multiplicity.optional)
+    @Help("Opcjonalna ścieżka do pliku")
+    string path = "";
+	@Option("method","m")
+    @Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE)")
+    string method = "";
+}
+
+immutable usage = usageString!Options("example");
+immutable help = helpString!Options;
 
 void main(string[] args)
 {
 	writeln(import("intro.txt"));
+
+	Options options;
+
+    try
+    {
+        options = parseArgs!Options(args[1 .. $]);
+    }
+    catch (ArgParseError e)
+    {
+        writeln(e.msg);
+        writeln(usage);
+        return;
+    }
+    catch (ArgParseHelp e)
+    {
+        writeln(usage);
+        write(help);
+        return;
+    }
+	
 	char[] column_names = [];
 	uint[] F = [];
 	uint[] R = [];
-	if (args.length == 1)
+	if (options.path == "")
 	{
 		input_output.read_from_input(column_names, F, R);
 	}
 	else
 	{
-		writefln("Odczytywanie z pliku: %s\n",args[1]);
-		input_output.read_from_file(args[1], column_names, F, R);
+		input_output.read_from_file(options.path, column_names, F, R);
 	}
-	//SimpleImplicant[] smart_simple_implicants = smart.smart_method(F.dup,R.dup,column_names.dup);
-	SimpleImplicant[] simple_implicants = heuristic.heuristic_method(F,R,column_names);
-	
-	
-	string[] stringed_simple_implicants = [];
-	foreach (SimpleImplicant simple_implicant; simple_implicants)
-	{
-		stringed_simple_implicants ~= simple_implicant_to_string(simple_implicant, column_names);
+	SimpleImplicant[] simple_implicants;
+	switch (options.method){
+		case "SMART":
+			simple_implicants = smart_method(F,R,column_names);
+			break;
+		case "HEURISTIC":
+			simple_implicants = heuristic_method(F,R,column_names);
+			break;
+		case "NONE":
+			simple_implicants = minterms(F,R,column_names);
+			break;
+		default:
+			simple_implicants = heuristic_method(F,R,column_names);
+			break;
 	}
-	string[] stringed_smart_simple_implicants = [];
-	/*foreach (SimpleImplicant simple_implicant; smart_simple_implicants)
-	{
-		stringed_smart_simple_implicants ~= simple_implicant_to_string(simple_implicant, column_names);
-	}*/
-	writefln("Uproszczone wyrazenie booleowskie (h): %s", stringed_simple_implicants.join(" + "));
-	//writefln("Uproszczone wyrazenie booleowskie (s): %s", stringed_smart_simple_implicants.join(" + "));
+	
+
+	writefln("Uproszczone wyrazenie booleowskie: %s", simple_implicant_to_string(simple_implicants,column_names));
 }

@@ -1,2 +1,2 @@
 MINAX - Program do minimalizacji funkcji boolewskich
-Copyright (C) 2024 Krzysztof Kubicz CC BY-SA 4.0
+Copyright (C) 2024 Krzysztof Kubicz CC-BY-SA 4.0

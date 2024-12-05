@@ -1,4 +1,4 @@
-module heuristic;
+module methods.heuristic;
 
 import simple_implicant;
 
