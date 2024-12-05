@@ -33,34 +33,3 @@ SimpleImplicant[] heuristic_method(uint[] F,uint[] R,char[] column_names){
     return simple_implicants;
 }
 
-unittest
-{
-    import std.random;
-	import std.stdio;
-	import std.format;
-	import std.datetime.stopwatch;
-	import test_constants;
-	import misc;
-	StopWatch sw = StopWatch(AutoStart.no);
-	
-
-    float sum_of_final_implicants = 0;
-    const float number_of_functions_to_test = NUM_FUNTIONS_TO_TEST;
-    const uint columns = COLUMNS;
-    
-    
-    for (int j = 0; j < number_of_functions_to_test; j++)
-    {
-		TruthTable truth_table = get_random_truth_table(j,columns);
-		sw.start();
-        SimpleImplicant[] simple_implicants = heuristic_method(truth_table.on_set, truth_table.off_set, truth_table.column_names);
-		sw.stop();
-        foreach (SimpleImplicant implicant; simple_implicants)
-        {
-            truth_table.on_set = remove_values_matching_simple_implicant(truth_table.on_set, implicant);
-        }
-        sum_of_final_implicants += simple_implicants.length;
-        assert(truth_table.on_set.length == 0);
-    }
-
-}

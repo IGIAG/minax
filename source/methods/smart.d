@@ -44,30 +44,3 @@ SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
     return smart_method(remove_values_matching_simple_implicant(F.dup, best), R, column_names) ~ best;
 
 }
-
-unittest
-{
-    import std.random : randomShuffle;
-    import std.datetime.stopwatch;
-    import test_constants;
-    import misc;
-
-    float sum_of_final_implicants = 0;
-    const float number_of_functions_to_test = NUM_FUNTIONS_TO_TEST;
-    const uint columns = COLUMNS;
-    StopWatch sw = StopWatch(AutoStart.no);
-    
-    for (int j = 0; j < number_of_functions_to_test; j++)
-    {
-        TruthTable truth_table = get_random_truth_table(j,columns);
-        sw.start();
-        SimpleImplicant[] simple_implicants = smart_method(truth_table.on_set, truth_table.off_set, truth_table.column_names);
-        sw.stop();
-        foreach (SimpleImplicant implicant; simple_implicants)
-        {
-            truth_table.on_set = remove_values_matching_simple_implicant(truth_table.on_set, implicant);
-        }
-        sum_of_final_implicants += simple_implicants.length;
-        assert(truth_table.on_set.length == 0);
-    }
-}

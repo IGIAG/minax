@@ -22,7 +22,7 @@ struct Options
     string method = "";
 }
 
-immutable usage = usageString!Options("example");
+immutable usage = usageString!Options("minax");
 immutable help = helpString!Options;
 
 void main(string[] args)
