@@ -4,22 +4,9 @@ import simple_implicant;
 
 import block_matrix;
 
-import core.bitop : popcnt;
-
-import std.stdio;
-import std.string;
-
-import std.random;
-
-struct Record
-{
-    SimpleImplicant implicant;
-    uint covered;
-}
 
 SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
 {
-    SimpleImplicant[uint] coverage_map;
     SimpleImplicant best;
     uint best_coverage = 0;
     foreach (uint cube; F)
