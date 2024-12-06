@@ -5,6 +5,7 @@ import block_matrix;
 import input_output;
 import methods.heuristic;
 import methods.smart;
+import methods.systemic;
 import methods.none;
 import darg;
 
@@ -69,6 +70,9 @@ void main(string[] args)
 			break;
 		case "NONE":
 			simple_implicants = minterms(F,R,column_names);
+			break;
+		case "FULL":
+			simple_implicants = systemic(F,R,column_names);
 			break;
 		default:
 			simple_implicants = heuristic_method(F,R,column_names);

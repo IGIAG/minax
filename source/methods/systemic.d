@@ -4,58 +4,40 @@ import simple_implicant;
 
 import block_matrix;
 
+import methods.heuristic;
+
 import std.stdio;
+import std.math;
 
 SimpleImplicant[] systemic(uint[] F,uint[] R,char[] column_names){
-    SimpleImplicant[] returnable = [];
-    uint mask = cast(uint)(1 << column_names.length) - 1;
-    foreach (uint row; F)
+    return recurrance(F,R,column_names,0);
+}
+private SimpleImplicant[] recurrance(uint[] F,uint[] R,char[] column_names,uint depth){
+    SimpleImplicant[] next_simple_impicants = [];
+    foreach (uint cube; F)
+    {   
+        next_simple_impicants ~= get_simple_implicant(cube,generate_block_matrix(cube,R),(1 << column_names.length) - 1,column_names);
+    }
+    
+
+    if(next_simple_impicants.length == 1){
+        return next_simple_impicants;
+    }
+
+    uint best_case = cast(uint)F.length;
+    SimpleImplicant[] best_path = [];
+
+    foreach (SimpleImplicant next_simple_implicant; next_simple_impicants)
     {
-        returnable ~= get_simple_implicant(row,generate_block_matrix(row,R),mask,column_names);
-    }
-    if(returnable.length > 128){
-        throw new Exception("Function too large!!!");
-    }
-    ulong max_combination_mask = (1 << returnable.length) - 1;
-
-    ulong combination_mask = 0;
-
-    SimpleImplicant[] best_combination = returnable.dup;
-
-    while(combination_mask < max_combination_mask){
-        SimpleImplicant[] combination = parse_combination_mask(returnable,combination_mask);
-
-        if(is_combination_valid(F.dup,combination)){
-            if(combination.length < best_combination.length){
-                best_combination = combination;
-            }
+        SimpleImplicant[] path = recurrance(remove_values_matching_simple_implicant(F,next_simple_implicant),R,column_names,depth + 1);
+        if(cast(uint)path.length < best_case){
+            //writefln("Found new best path: %s | score %s",best_path,path.length);
+            best_path = path;
+            best_path ~= next_simple_implicant;
+            best_case = cast(uint)best_path.length;
         }
-
-        //writefln("%s",combination);
-
-        combination_mask++;
     }
-
-
-
-    return best_combination;
-}
-SimpleImplicant[] parse_combination_mask(SimpleImplicant[] source,ulong combination_mask){
-    SimpleImplicant[] returnable = [];
-    int shift = 0;
-    while((combination_mask >> shift) > 0){
-        if((combination_mask >> shift) % 2 == 1){
-            returnable ~= source[shift];
-        }
-        shift++;
-    }
-    return returnable;
+    //writefln("RETURNING!!!");
+    return best_path;
 }
 
-bool is_combination_valid(uint[] F,SimpleImplicant[] implicants){
-    foreach (SimpleImplicant implicant; implicants)
-    {
-        F = remove_values_matching_simple_implicant(F,implicant);
-    }
-    return F.length == 0;
-}
