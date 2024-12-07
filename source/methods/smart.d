@@ -3,7 +3,9 @@ module methods.smart;
 import simple_implicant;
 
 import block_matrix;
+import std.functional;
 
+alias fast_smart_method = memoize!smart_method;
 
 SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
 {
@@ -28,6 +30,5 @@ SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
     {
         return [];
     }
-    return smart_method(remove_values_matching_simple_implicant(F.dup, best), R, column_names) ~ best;
-
+    return fast_smart_method(remove_values_matching_simple_implicant(F.dup, best), R, column_names) ~ best;
 }

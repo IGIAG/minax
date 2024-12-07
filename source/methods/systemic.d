@@ -4,58 +4,53 @@ import simple_implicant;
 
 import block_matrix;
 
+import methods.none;
+
 import std.stdio;
 
+import std.functional;
+
 SimpleImplicant[] systemic(uint[] F,uint[] R,char[] column_names){
-    SimpleImplicant[] returnable = [];
-    uint mask = cast(uint)(1 << column_names.length) - 1;
-    foreach (uint row; F)
-    {
-        returnable ~= get_simple_implicant(row,generate_block_matrix(row,R),mask,column_names);
+    writeln("UWAGA! TA METODA JEST EKSPERYMENTALNA.");
+    if(column_names.length > 5){
+        writeln("\x1B[0;31mPODANO WIĘCEJ NIŻ 5 KOLUMN. DLA TEJ METODY TO ZŁY POMYSŁ!\x1B[0;37m");
+        writeln("\x1B[0;33mWYMAGANIE POTWIERDZENIE [ENTER]\x1B[0;37m");
+        readln();
     }
-    if(returnable.length > 128){
-        throw new Exception("Function too large!!!");
-    }
-    ulong max_combination_mask = (1 << returnable.length) - 1;
-
-    ulong combination_mask = 0;
-
-    SimpleImplicant[] best_combination = returnable.dup;
-
-    while(combination_mask < max_combination_mask){
-        SimpleImplicant[] combination = parse_combination_mask(returnable,combination_mask);
-
-        if(is_combination_valid(F.dup,combination)){
-            if(combination.length < best_combination.length){
-                best_combination = combination;
-            }
-        }
-
-        //writefln("%s",combination);
-
-        combination_mask++;
-    }
-
-
-
-    return best_combination;
-}
-SimpleImplicant[] parse_combination_mask(SimpleImplicant[] source,ulong combination_mask){
-    SimpleImplicant[] returnable = [];
-    int shift = 0;
-    while((combination_mask >> shift) > 0){
-        if((combination_mask >> shift) % 2 == 1){
-            returnable ~= source[shift];
-        }
-        shift++;
-    }
-    return returnable;
+    return recurrance(F,R,column_names,0);
 }
 
-bool is_combination_valid(uint[] F,SimpleImplicant[] implicants){
-    foreach (SimpleImplicant implicant; implicants)
-    {
-        F = remove_values_matching_simple_implicant(F,implicant);
+alias fast_recurrance = memoize!(recurrance,5000_000);
+
+private SimpleImplicant[] recurrance(uint[] F,uint[] R,char[] column_names,uint depth){
+    SimpleImplicant[] next_simple_impicants = [];
+    foreach (uint cube; F)
+    {   
+        next_simple_impicants ~= fast_simple_implicants(cube,generate_block_matrix(cube,R),(1 << column_names.length) - 1,column_names);
     }
-    return F.length == 0;
+    if(next_simple_impicants.length == 0){
+        return [];
+    }
+
+    if(next_simple_impicants.length == 1){
+        return next_simple_impicants;
+    }
+    uint best_case = cast(uint)F.length;
+    SimpleImplicant[] best_path = [];
+    uint i = 0;
+    foreach (SimpleImplicant next_simple_implicant; next_simple_impicants)
+    {
+        if(depth == 0){
+            writefln("%s %% (%s/%s)",i*100/next_simple_impicants.length,i,next_simple_impicants.length);
+        }
+        SimpleImplicant[] path = fast_recurrance(fast_remove_matching(F,next_simple_implicant),R,column_names,depth + 1);
+        if(cast(uint)path.length < best_case){
+            
+            best_path = path;
+            best_path ~= next_simple_implicant;
+            best_case = cast(uint)best_path.length;
+        }
+        i++;
+    }
+    return best_path;
 }

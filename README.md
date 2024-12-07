@@ -6,7 +6,12 @@
 1. Dane do programu można załadować z:
     - pliku
     - wejścia standardowego
-2. Aby załadować z pliku należy użyć odpowiedniego formatu. Przykładowy plik znajduje się w repozytorium pod nazwą `testfile.txt`.
+2. Metodę obliczeń można wybrać parametrem `-m` lub `--method=`. Dostępne metody to:
+    - `NONE` - brak minimalizacji, wypisanie mintermów funkcji.
+    - `HEURISTIC` (Default) - metoda heurystyczna.
+    - `SMART` - metoda heurystyczna inteligentna. Wybiera implikanty po ilośći pokrywanych kostek.
+    - `FULL` (Eksperymentalna) - metoda systematyczna. Powinna zawsze dawać najbardziej zoptymalizowane wyniki. BARDZO WOLNA!
+3. Aby załadować z pliku należy użyć odpowiedniego formatu. Przykładowy plik znajduje się w repozytorium pod nazwą `testfile.txt`.
     - każda sekcja jest oddzielona pustym wierszem
     - pierwsza linijka pliku wybiera tryb należy tam wpisać `BINARY` lub `DECIMAL` (w trybie decimal podajemy nr. wierszów)
     - drugi wiersz definiuje nazwy parametrów (kolumn)
@@ -33,7 +38,7 @@
         | 0 | 1 | 0 |
         | 1 | 0 | 1 |
         | 1 | 1 | 0 |
-3. Aby wczytać dane z wejścia standardowego, niepodawaj parametru.
+4. Aby wczytać dane z wejścia standardowego, niepodawaj parametru.
 
 ## Ograniczenia:
 

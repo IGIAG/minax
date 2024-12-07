@@ -46,5 +46,5 @@ unittest
     test_method(&heuristic_method, "HEURISTIC");
     test_method(&smart_method, "SMART");
     test_method(&minterms, "NONE");
-    //test_method(&systemic, "SYSTEMATIC");
+    //test_method(&systemic, "SYSTEMATIC"); This method is jank anyways
 }

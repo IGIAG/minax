@@ -11,6 +11,8 @@ import std.container;
 import std.range;
 import core.bitop;
 
+import std.functional;
+
 enum SimpleImplicantValue
 {
     TRUE,
@@ -69,6 +71,8 @@ string simple_implicant_to_string(SimpleImplicant[] simple_implicants, char[] co
 W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 */
 
+alias fast_simple_implicants = memoize!(get_simple_implicant,1000_000);
+
 SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value, char[] column_names)
 {
     uint mask = 0;
@@ -119,6 +123,8 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
     assert(returnable.length > 0);
     return returnable;
 }
+
+alias fast_remove_matching = memoize!(remove_values_matching_simple_implicant,1000_000);
 
 uint[] remove_values_matching_simple_implicant(uint[] source, SimpleImplicant simple_implicant)
 {

@@ -11,7 +11,7 @@
             "name": "Build & Debug DUB project",
             "cwd": "${command:dubWorkingDirectory}",
             "program": "${command:dubTarget}",
-            "args": ["testfile.txt"]
+            "args": ["--method=FULL","testfile.txt"]
         }
     ]
 }
