@@ -19,7 +19,7 @@ struct Options
 	@Help("Opcjonalna ścieżka do pliku")
 	string path = "";
 	@Option("method", "m")
-	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE)")
+	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,FULL)")
 	string method = "";
 }
 
