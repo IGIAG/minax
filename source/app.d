@@ -11,16 +11,16 @@ import darg;
 
 struct Options
 {
-    @Option("help", "h")
-    @Help("Wyświetla tę wiadomość")
-    OptionFlag help;
+	@Option("help", "h")
+	@Help("Wyświetla tę wiadomość")
+	OptionFlag help;
 
-    @Argument("file",Multiplicity.optional)
-    @Help("Opcjonalna ścieżka do pliku")
-    string path = "";
-	@Option("method","m")
-    @Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE)")
-    string method = "";
+	@Argument("file", Multiplicity.optional)
+	@Help("Opcjonalna ścieżka do pliku")
+	string path = "";
+	@Option("method", "m")
+	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE)")
+	string method = "";
 }
 
 immutable usage = usageString!Options("minax");
@@ -32,23 +32,23 @@ void main(string[] args)
 
 	Options options;
 
-    try
-    {
-        options = parseArgs!Options(args[1 .. $]);
-    }
-    catch (ArgParseError e)
-    {
-        writeln(e.msg);
-        writeln(usage);
-        return;
-    }
-    catch (ArgParseHelp e)
-    {
-        writeln(usage);
-        write(help);
-        return;
-    }
-	
+	try
+	{
+		options = parseArgs!Options(args[1 .. $]);
+	}
+	catch (ArgParseError e)
+	{
+		writeln(e.msg);
+		writeln(usage);
+		return;
+	}
+	catch (ArgParseHelp e)
+	{
+		writeln(usage);
+		write(help);
+		return;
+	}
+
 	char[] column_names = [];
 	uint[] F = [];
 	uint[] R = [];
@@ -61,24 +61,25 @@ void main(string[] args)
 		input_output.read_from_file(options.path, column_names, F, R);
 	}
 	SimpleImplicant[] simple_implicants;
-	switch (options.method){
-		case "SMART":
-			simple_implicants = smart_method(F,R,column_names);
-			break;
-		case "HEURISTIC":
-			simple_implicants = heuristic_method(F,R,column_names);
-			break;
-		case "NONE":
-			simple_implicants = minterms(F,R,column_names);
-			break;
-		case "FULL":
-			simple_implicants = systemic(F,R,column_names);
-			break;
-		default:
-			simple_implicants = heuristic_method(F,R,column_names);
-			break;
+	switch (options.method)
+	{
+	case "SMART":
+		simple_implicants = smart_method(F, R, column_names);
+		break;
+	case "HEURISTIC":
+		simple_implicants = heuristic_method(F, R, column_names);
+		break;
+	case "NONE":
+		simple_implicants = minterms(F, R, column_names);
+		break;
+	case "FULL":
+		simple_implicants = systemic(F, R, column_names);
+		break;
+	default:
+		simple_implicants = heuristic_method(F, R, column_names);
+		break;
 	}
-	
 
-	writefln("Uproszczone wyrazenie booleowskie: %s", simple_implicant_to_string(simple_implicants,column_names));
+	writefln("Uproszczone wyrazenie booleowskie: %s", simple_implicant_to_string(
+			simple_implicants, column_names));
 }
