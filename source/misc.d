@@ -1,6 +1,8 @@
 module misc;
 import std.format;
 import std.random;
+import simple_implicant;
+import std.stdio;
 
 struct TruthTable
 {

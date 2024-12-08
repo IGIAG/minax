@@ -2,6 +2,8 @@ module methods.smart;
 
 import simple_implicant;
 
+import misc;
+
 import block_matrix;
 import std.functional;
 

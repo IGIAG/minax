@@ -21,6 +21,8 @@ struct Options
 	@Option("method", "m")
 	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,FULL)")
 	string method = "";
+	@Flag("show-progress")
+	@Help("(Działa tylko dla metody FULL) Wypisuje nr. iteracji oraz ilość znalezionych ścieżek w czasie rzeczywistym.")
 }
 
 immutable usage = usageString!Options("minax");
