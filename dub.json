@@ -11,7 +11,5 @@
 	"name": "minax",
 	"stringImportPaths": [
 		"views"
-	],
-	"dflags": ["-O5"],
-	"lflags": [ "-Bstatic", "-Bdynamic" ]
+	]
 }

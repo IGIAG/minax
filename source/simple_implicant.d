@@ -13,6 +13,9 @@ import core.bitop;
 
 import std.functional;
 
+import std.string;
+import std.format;
+
 enum SimpleImplicantValue
 {
     TRUE,

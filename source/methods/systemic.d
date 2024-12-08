@@ -4,53 +4,113 @@ import simple_implicant;
 
 import block_matrix;
 
+import methods.heuristic;
+
 import methods.none;
 
 import std.stdio;
 
 import std.functional;
 
-SimpleImplicant[] systemic(uint[] F,uint[] R,char[] column_names){
-    writeln("UWAGA! TA METODA JEST EKSPERYMENTALNA.");
-    if(column_names.length > 5){
-        writeln("\x1B[0;31mPODANO WIĘCEJ NIŻ 5 KOLUMN. DLA TEJ METODY TO ZŁY POMYSŁ!\x1B[0;37m");
-        writeln("\x1B[0;33mWYMAGANIE POTWIERDZENIE [ENTER]\x1B[0;37m");
-        readln();
+import std.algorithm;
+
+import std.array;
+
+import std.parallelism;
+
+import std.digest.crc;
+
+import std.algorithm.sorting;
+
+import state;
+
+private struct Path
+{
+    SimpleImplicant[] simple_implicants;
+    uint[] remaining_cubes = [];
+    bool reduce()
+    {
+        foreach (SimpleImplicant implicant; simple_implicants)
+        {
+            remaining_cubes = remove_values_matching_simple_implicant(remaining_cubes, implicant);
+        }
+        return remaining_cubes.length == 0;
     }
-    return recurrance(F,R,column_names,0);
 }
 
-alias fast_recurrance = memoize!(recurrance,5000_000);
+SimpleImplicant[] systemic(uint[] F, uint[] R, char[] column_names)
+{
+    SimpleImplicant[] simple_implciants = [];
 
-private SimpleImplicant[] recurrance(uint[] F,uint[] R,char[] column_names,uint depth){
-    SimpleImplicant[] next_simple_impicants = [];
     foreach (uint cube; F)
-    {   
-        next_simple_impicants ~= fast_simple_implicants(cube,generate_block_matrix(cube,R),(1 << column_names.length) - 1,column_names);
-    }
-    if(next_simple_impicants.length == 0){
-        return [];
+    {
+        simple_implciants ~= get_simple_implicant(cube,generate_block_matrix(cube,R),(1 << column_names.length) - 1,column_names);
     }
 
-    if(next_simple_impicants.length == 1){
-        return next_simple_impicants;
-    }
-    uint best_case = cast(uint)F.length;
-    SimpleImplicant[] best_path = [];
-    uint i = 0;
-    foreach (SimpleImplicant next_simple_implicant; next_simple_impicants)
+    Path[] paths = [];
+
+    foreach (SimpleImplicant imp; simple_implciants)
     {
-        if(depth == 0){
-            writefln("%s %% (%s/%s)",i*100/next_simple_impicants.length,i,next_simple_impicants.length);
+        paths ~= Path([imp],F.dup);
+    }
+
+    uint i = 0;
+    while (true)
+    {
+        foreach (Path path; paths)
+        {
+            if (path.reduce() && path.simple_implicants.length != 0)
+            {
+                return path.simple_implicants;
+            }
         }
-        SimpleImplicant[] path = fast_recurrance(fast_remove_matching(F,next_simple_implicant),R,column_names,depth + 1);
-        if(cast(uint)path.length < best_case){
+        if(SHOW_PROGRESS){
+            writefln("it %s | paths to process %s",i,paths.length);
+        }
+        Path[] next_paths = [];
+        foreach (Path path; taskPool.parallel(paths, 4))
+        {
+            path.reduce();
+            foreach (uint cube; path.remaining_cubes)
+            {
+                SimpleImplicant[] next_simple_implicants = fast_simple_implicants(cube, generate_block_matrix(cube, R), (
+                        1 << column_names.length) - 1, column_names);
+                foreach (SimpleImplicant next_simple_implicant; next_simple_implicants)
+                {
+                    synchronized {
+                        next_paths ~= Path(path.simple_implicants ~ next_simple_implicant, F.dup);
+                    }
+                    
+    
+                }
+
+            }
+        }
+        if(SHOW_PROGRESS){
+            writefln("it %s | filtering...",i);
+        }
+        
+        Path[string] dup_table;
+        foreach (Path path; taskPool.parallel(next_paths, 1))
+        {
+            uint[] implicant_values = [];
+            path.simple_implicants.sort!((a,b) => (a.cube + a.mask) < (b.cube + b.mask))();
+            foreach (SimpleImplicant imp; path.simple_implicants)
+            {
+                implicant_values ~= imp.cube;
+                implicant_values ~= imp.mask;
+            }
+            synchronized {
+                dup_table[crcHexString(crc32Of(implicant_values))] = path;
+            }
             
-            best_path = path;
-            best_path ~= next_simple_implicant;
-            best_case = cast(uint)best_path.length;
         }
+        if(SHOW_PROGRESS){
+            writefln("it %s done. full_next_paths %s | unique %s",i,next_paths.length,dup_table.values.length);
+        }
+        
+        paths = dup_table.values;
         i++;
     }
-    return best_path;
+
 }
