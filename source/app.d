@@ -23,7 +23,7 @@ struct Options
 	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,FULL)")
 	string method = "";
 	@Option("cap", "c")
-	@Help("Tylko dla metody FULL. Opcjonalny parametr, ogranicza przeszukiwane kombinacje implikantów. Ustawienie wartości ogranicza możliwości programu.")
+	@Help("Tylko dla metody FULL. Opcjonalny parametr, ogranicza przeszukiwane kombinacje implikantów. Ustawnienie tego parametru neguje systematyczność tej metody ale ma duże zyski wydajnościowe")
 	int full_cap = 0;
 	@Option("show-progress", "s")
 	@Help("(Działa tylko dla metody FULL) Wypisuje nr. iteracji oraz ilość znalezionych ścieżek w czasie rzeczywistym.")
