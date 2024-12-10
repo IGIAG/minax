@@ -4,6 +4,7 @@
 	],
 	"copyright": "Copyright © 2024, igiag",
 	"dependencies": {
+		"console-colors": "~>1.3.1",
 		"darg": "~>0.1.0"
 	},
 	"description": "Program do minimalizacji funkcji booleowskich",
