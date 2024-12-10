@@ -22,10 +22,13 @@ struct Options
 	@Option("method", "m")
 	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,FULL)")
 	string method = "";
-	@Option("show-progress","s")
+	@Option("cap", "c")
+	@Help("Tylko dla metody FULL. Opcjonalny parametr, ogranicza przeszukiwane kombinacje implikantów. Ustawienie wartości ogranicza możliwości programu.")
+	int full_cap = 0;
+	@Option("show-progress", "s")
 	@Help("(Działa tylko dla metody FULL) Wypisuje nr. iteracji oraz ilość znalezionych ścieżek w czasie rzeczywistym.")
 	bool show_progress = false;
-	
+
 }
 
 immutable usage = usageString!Options("minax");
@@ -78,7 +81,11 @@ void main(string[] args)
 		simple_implicants = minterms(F, R, column_names);
 		break;
 	case "FULL":
-		if(options.show_progress){SHOW_PROGRESS = true;}
+		if (options.show_progress)
+		{
+			SHOW_PROGRESS = true;
+		}
+		state.FULL_CAP = options.full_cap;
 		simple_implicants = systemic(F, R, column_names);
 		break;
 	default:
