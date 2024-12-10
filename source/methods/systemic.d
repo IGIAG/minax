@@ -24,17 +24,29 @@ import std.algorithm.sorting;
 
 import state;
 
+import core.memory;
+
+import std.typecons;
+
 private struct Path
 {
     SimpleImplicant[] simple_implicants;
-    uint[] remaining_cubes = [];
-    bool reduce()
+    bool reduce(uint[] F)
     {
+        uint[] cubes = F.dup;
         foreach (SimpleImplicant implicant; simple_implicants)
         {
-            remaining_cubes = remove_values_matching_simple_implicant(remaining_cubes, implicant);
+            cubes = fast_remove_matching(cubes, implicant);
         }
-        return remaining_cubes.length == 0;
+        return cubes.length == 0;
+    }
+    uint[] remaining_cubes(uint[] F){
+        uint[] cubes = F.dup;
+        foreach (SimpleImplicant implicant; simple_implicants)
+        {
+            cubes = fast_remove_matching(cubes, implicant);
+        }
+        return cubes;
     }
 }
 
@@ -51,47 +63,55 @@ SimpleImplicant[] systemic(uint[] F, uint[] R, char[] column_names)
 
     foreach (SimpleImplicant imp; simple_implciants)
     {
-        paths ~= Path([imp],F.dup);
+        paths ~= Path([imp]);
     }
 
     uint i = 0;
     while (true)
     {
-        foreach (Path path; paths)
-        {
-            if (path.reduce() && path.simple_implicants.length != 0)
-            {
-                return path.simple_implicants;
-            }
-        }
         if(SHOW_PROGRESS){
             writefln("it %s | paths to process %s",i,paths.length);
         }
         Path[] next_paths = [];
-        foreach (Path path; taskPool.parallel(paths, 4))
+
+        shared Path full_path;
+        shared bool found_full_path = false;
+
+        foreach (Path path; taskPool.parallel(paths, max(paths.length / taskPool.size,1)))
         {
-            path.reduce();
-            foreach (uint cube; path.remaining_cubes)
+            
+            if(path.reduce(F) && path.simple_implicants.length != 0){
+                synchronized {
+                    full_path = cast(shared)path;
+                    found_full_path = true;
+                }
+            }
+            foreach (uint cube; path.remaining_cubes(F))
             {
                 SimpleImplicant[] next_simple_implicants = fast_simple_implicants(cube, generate_block_matrix(cube, R), (
                         1 << column_names.length) - 1, column_names);
                 foreach (SimpleImplicant next_simple_implicant; next_simple_implicants)
                 {
                     synchronized {
-                        next_paths ~= Path(path.simple_implicants ~ next_simple_implicant, F.dup);
+                        next_paths ~= Path(path.simple_implicants ~ next_simple_implicant);
                     }
                     
     
                 }
-
             }
         }
+        synchronized {
+            if(found_full_path){
+            return cast(SimpleImplicant[])full_path.simple_implicants;
+        }
+        }
+        
         if(SHOW_PROGRESS){
             writefln("it %s | filtering...",i);
         }
         
         Path[string] dup_table;
-        foreach (Path path; taskPool.parallel(next_paths, 1))
+        foreach (Path path; taskPool.parallel(next_paths, max(paths.length / taskPool.size,1)))
         {
             uint[] implicant_values = [];
             path.simple_implicants.sort!((a,b) => (a.cube + a.mask) < (b.cube + b.mask))();
@@ -108,6 +128,17 @@ SimpleImplicant[] systemic(uint[] F, uint[] R, char[] column_names)
         if(SHOW_PROGRESS){
             writefln("it %s done. full_next_paths %s | unique %s",i,next_paths.length,dup_table.values.length);
         }
+        ulong bytes_freed = GC.stats().usedSize;
+        if(SHOW_PROGRESS){
+            writefln("cleaning up!");
+        }
+        
+        GC.collect();
+        bytes_freed -= GC.stats().usedSize;
+        if(SHOW_PROGRESS){
+            writefln("clear! Freed %s bytes.",bytes_freed);
+        }
+        
         
         paths = dup_table.values;
         i++;
