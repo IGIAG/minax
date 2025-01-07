@@ -58,6 +58,9 @@ struct SimpleImplicant
 
         return returnable;
     }
+    bool contains(SimpleImplicant b){
+        return (b.mask & mask) == b.mask;
+    }
 }
 
 string simple_implicant_to_string(SimpleImplicant[] simple_implicants, char[] column_names)

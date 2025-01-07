@@ -9,6 +9,7 @@ import methods.systemic;
 import methods.none;
 import darg;
 import state;
+import methods.systematic;
 
 struct Options
 {
@@ -87,6 +88,9 @@ void main(string[] args)
 		}
 		state.FULL_CAP = options.full_cap;
 		simple_implicants = systemic(F, R, column_names);
+		break;
+	case "SYSTEMATIC":
+		simple_implicants = systematic(F, R, column_names);
 		break;
 	default:
 		simple_implicants = heuristic_method(F, R, column_names);

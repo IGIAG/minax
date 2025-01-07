@@ -13,6 +13,7 @@ unittest
     import methods.none;
     import methods.systemic;
     import simple_implicant;
+    import methods.systematic;
 
     void test_method(SimpleImplicant[] function(uint[], uint[], char[]) tested, string method_name)
     {
@@ -46,5 +47,6 @@ unittest
     test_method(&heuristic_method, "HEURISTIC");
     test_method(&smart_method, "SMART");
     test_method(&minterms, "NONE");
-    test_method(&systemic, "SYSTEMATIC");
+    //test_method(&systemic, "SYSTEMATIC");
+    test_method(&systematic, "HOLY SHITT");
 }
