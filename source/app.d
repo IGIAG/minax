@@ -11,6 +11,8 @@ import darg;
 import state;
 import methods.systematic;
 
+import misc;
+
 struct Options
 {
 	@Option("help", "h")
@@ -21,7 +23,7 @@ struct Options
 	@Help("Opcjonalna ścieżka do pliku")
 	string path = "";
 	@Option("method", "m")
-	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,FULL)")
+	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,BRUTE,SYSTEMATIC)")
 	string method = "";
 	@Option("cap", "c")
 	@Help("Tylko dla metody FULL. Opcjonalny parametr, ogranicza przeszukiwane kombinacje implikantów. Ustawnienie tego parametru neguje systematyczność tej metody ale ma duże zyski wydajnościowe")
@@ -37,6 +39,7 @@ immutable help = helpString!Options;
 
 void main(string[] args)
 {
+
 	writeln(import("intro.txt"));
 
 	Options options;
@@ -81,7 +84,7 @@ void main(string[] args)
 	case "NONE":
 		simple_implicants = minterms(F, R, column_names);
 		break;
-	case "FULL":
+	case "BRUTE":
 		if (options.show_progress)
 		{
 			SHOW_PROGRESS = true;

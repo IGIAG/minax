@@ -31,3 +31,20 @@ TruthTable get_random_truth_table(int seed,int columns)
     }
     return TruthTable(F,R,column_names);
 }
+
+uint safe_shift_left(uint a,ubyte amount){
+    uint r = a << amount;
+    if(r <= a && amount != 0){
+        throw new Error("SHIFT OVERFLOW (UINT)");
+    }
+    return r;
+}
+
+ulong safe_shift_left(ulong a,uint amount){
+    ulong r = a << amount;
+    
+    if(r <= a && amount != 0){
+        throw new Exception("SHIFT OVERFLOW (ULONG)");
+    }
+    return r;
+}

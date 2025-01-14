@@ -59,7 +59,7 @@ struct SimpleImplicant
         return returnable;
     }
     bool contains(SimpleImplicant b){
-        return (b.mask & mask) == b.mask;
+        return b.mask == mask && (b.cube & b.mask) == (cube & mask);
     }
 }
 
