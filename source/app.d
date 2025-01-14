@@ -109,7 +109,6 @@ void main(string[] args)
 			
 		}
 		return;
-		break;
 	default:
 		simple_implicants = heuristic_method(F, R, column_names);
 		break;

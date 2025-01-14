@@ -1,4 +1,4 @@
 module tests.test_constants;
 
-const COLUMNS = 6;
-const NUM_FUNTIONS_TO_TEST = 4;
+const COLUMNS = 5;
+const NUM_FUNTIONS_TO_TEST = 8000;
