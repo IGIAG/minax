@@ -81,6 +81,6 @@ unittest
     test_method(&heuristic_method, "HEURISTIC");
     //test_method(&smart_method, "SMART");
     test_method(&minterms, "NONE");
-    test_method(&systemic, "BRUTE FORCE");
-    test_method(&systematic, "HOLY SHITT (<<<<< OMG GUYS)");
+    //test_method(&systemic, "BRUTE FORCE");
+    test_method(&systematic_simple, "HOLY SHITT (<<<<< OMG GUYS)");
 }

@@ -61,6 +61,9 @@ struct SimpleImplicant
     bool contains(SimpleImplicant b){
         return b.mask == mask && (b.cube & b.mask) == (cube & mask);
     }
+    bool opCmp(SimpleImplicant b){
+        return cube == b.cube ? mask > b.mask : cube > b.cube;
+    }
 }
 
 string simple_implicant_to_string(SimpleImplicant[] simple_implicants, char[] column_names)

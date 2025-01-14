@@ -5,23 +5,36 @@ import block_matrix;
 import std.stdio;
 import core.bitop;
 import misc;
+import self_check;
+import std.digest.crc;
+import std.algorithm: canFind;
+import std.algorithm.sorting;
 
-SimpleImplicant[] systematic(uint[] F, uint[] R, char[] column_names)
+SimpleImplicant[] systematic_simple(uint[] F,uint[] R,char[] column_names){
+    return systematic(F,R,column_names)[0];
+}
+
+SimpleImplicant[][] systematic(uint[] F, uint[] R, char[] column_names)
 {
+    debug {
+        writefln("getting implicants...");
+    }
     SimpleImplicant[] implicants = [];
     uint mask = cast(uint)(1 << column_names.length) - 1;
     foreach (uint cube; F)
     {
         implicants ~= get_simple_implicant(cube, generate_block_matrix(cube, R), mask, column_names);
     }
-
-    /*SimpleImplicant[] temp = [];
+    debug {
+        writefln("removing duplicates...");
+    }
+    SimpleImplicant[] temp = [];
     foreach (SimpleImplicant a; implicants)
     {
         bool already_in_temp = false;
-        foreach (SimpleImplicant b; implicants)
+        foreach (SimpleImplicant b; temp)
         {
-            if(b.contains(a)){
+            if((a.cube & a.mask) == (b.cube & b.mask) && a.mask == b.mask){
                 already_in_temp = true;
                 break;
             }
@@ -29,10 +42,18 @@ SimpleImplicant[] systematic(uint[] F, uint[] R, char[] column_names)
         if(!already_in_temp){
             temp ~= a;
         }
-    }*/
-    //implicants = temp;
+    }
+    implicants = temp;
 
-    //writeln("getting matrix");
+    if(implicants.length == 28){
+        writefln("%s",F);
+        writefln("%s",R);
+        //assert(false);
+    }
+
+    debug {
+        writefln("converting to matrix");
+    }
     ulong[] implicant_matrix = new ulong[F.length];
     for (int implicant_index; implicant_index < implicants.length; implicant_index++)
     {
@@ -42,20 +63,25 @@ SimpleImplicant[] systematic(uint[] F, uint[] R, char[] column_names)
             uint cube = F[i];
             if (implicant.matches_value(cube))
             {
-                ulong one = 1; //KEK
-                //writeln(implicant_index);
-                implicant_matrix[i] = implicant_matrix[i] | (safe_shift_left(one, cast(ubyte) implicant_index));
+                implicant_matrix[i] = implicant_matrix[i] | (safe_shift_left(1L, cast(ubyte) implicant_index));
             }
         }
     }
-    //writeln("finding the best mask");
+
+    
+
+    
     ulong implicant_mask = 0;
     ulong full_set = (safe_shift_left(1, cast(uint) implicants.length)) - 1;
     ulong best_mask = full_set;
     ulong[] all_masks = [];
     bool found_good = false;
+    debug {
+        writefln("finding minimal column coverage...");
+    }
     while (implicant_mask <= full_set)
     {
+        if(popcnt(implicant_mask) > popcnt(best_mask)){implicant_mask++;continue;}
         ulong[] matrix = implicant_matrix.dup;
         for (ulong i = 0; i < matrix.length; i++)
         {
@@ -79,27 +105,18 @@ SimpleImplicant[] systematic(uint[] F, uint[] R, char[] column_names)
             //writefln("%b",implicant_mask);
         }
         implicant_mask++;
-    }
-    //writeln(implicants.length);
-    foreach (ulong row; implicant_matrix)
-    {
-        //string topad = format("%b",row);
-        //writefln("%s",row);
+        writefln("%s%% %b %b(%s) %b",implicant_mask * 100 / full_set,implicant_mask,best_mask,popcnt(best_mask),full_set);
     }
     if (!found_good)
     {
         throw new Error("NO VALID PATH!");
     }
-    else
-    {
-        //writefln("Found mask %b",best_mask);
+
+    debug {
+        writefln("getting the results...");
     }
 
-    //writeln("BEST MASK IS:");
-    //writefln("%b",best_mask);
-
     SimpleImplicant[] returnable = [];
-    //writeln("unmatrix-ification");
     ulong shift = implicants.length;
     while (best_mask > 0)
     {
@@ -111,7 +128,7 @@ SimpleImplicant[] systematic(uint[] F, uint[] R, char[] column_names)
         best_mask = best_mask >> 1;
         shift--;
     }
-
+    SimpleImplicant[][] returnable_all = [];
     foreach (ulong good_mask; all_masks)
     {
         if (popcnt(good_mask) == returnable.length)
@@ -129,21 +146,15 @@ SimpleImplicant[] systematic(uint[] F, uint[] R, char[] column_names)
                 good_mask = good_mask >> 1;
                 s--;
             }
-            TruthTable truth_table = TruthTable(F.dup,R.dup,column_names.dup);
-            ulong offsets_length = truth_table.off_set.length;
-            foreach (SimpleImplicant implicant; r1)
-            {
-                truth_table.on_set = remove_values_matching_simple_implicant(truth_table.on_set, implicant);
-                truth_table.off_set = remove_values_matching_simple_implicant(truth_table.off_set,implicant);
-                assert(truth_table.off_set.length == offsets_length);
-            }
-            assert(truth_table.on_set.length == 0);
-            writeln(simple_implicant_to_string(r1,column_names));
+            verify_expression(F.dup,R.dup,column_names,r1);
+            returnable_all ~= r1;
         }
         
     }
-
+    debug {
+        writefln("done");
+    }
     //writeln(simple_implicant_to_string(returnable,column_names));
     //writeln(simple_implicant_to_string(smart_method(F,R,column_names),column_names));
-    return returnable;
+    return returnable_all;
 }

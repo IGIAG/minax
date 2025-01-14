@@ -10,6 +10,7 @@ import methods.none;
 import darg;
 import state;
 import methods.systematic;
+import formatters.budyns;
 
 import misc;
 
@@ -31,6 +32,8 @@ struct Options
 	@Option("show-progress", "s")
 	@Help("(Działa tylko dla metody FULL) Wypisuje nr. iteracji oraz ilość znalezionych ścieżek w czasie rzeczywistym.")
 	bool show_progress = false;
+	@Option("budyn-format", "b")
+	bool budyn_format = false;
 
 }
 
@@ -93,7 +96,19 @@ void main(string[] args)
 		simple_implicants = systemic(F, R, column_names);
 		break;
 	case "SYSTEMATIC":
-		simple_implicants = systematic(F, R, column_names);
+		SimpleImplicant[][] results = systematic(F, R, column_names);
+		writefln("Rozwiązania");
+		foreach (SimpleImplicant[] key; results)
+		{
+			if(options.budyn_format){
+				writefln("%s",expression_to_string(key));
+			}
+			else {
+				writefln("%s",simple_implicant_to_string(key,column_names));
+			}
+			
+		}
+		return;
 		break;
 	default:
 		simple_implicants = heuristic_method(F, R, column_names);
