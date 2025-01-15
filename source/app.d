@@ -26,8 +26,8 @@ struct Options
 	@Help("Opcjonalna ścieżka do pliku")
 	string path = "";
 	@Option("method", "m")
-	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,BRUTE,SYSTEMATIC)")
-	string method = "";
+	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,GREEDY,BRUTE,SYSTEMATIC)")
+	string method = "GREEDY";
 	@Option("cap", "c")
 	@Help("Tylko dla metody FULL. Opcjonalny parametr, ogranicza przeszukiwane kombinacje implikantów. Ustawnienie tego parametru neguje systematyczność tej metody ale ma duże zyski wydajnościowe")
 	int full_cap = 0;
@@ -42,12 +42,15 @@ struct Options
 immutable usage = usageString!Options("minax");
 immutable help = helpString!Options;
 
-void main(string[] args){
-	try{
+void main(string[] args)
+{
+	try
+	{
 		_main(args);
 	}
-	catch(Exception ex){
-		cwritefln("<lred>ERROR</lred> %s",ex.message);
+	catch (Exception ex)
+	{
+		cwritefln("<lred>ERROR</lred> %s", ex.message);
 	}
 }
 
@@ -55,6 +58,7 @@ void _main(string[] args)
 {
 
 	writeln(import("intro.txt"));
+	
 
 	Options options;
 
@@ -74,7 +78,6 @@ void _main(string[] args)
 		write(help);
 		return;
 	}
-
 	char[] column_names = [];
 	uint[] F = [];
 	uint[] R = [];
@@ -125,19 +128,22 @@ void _main(string[] args)
 
 		}
 		return;
-	default:
+	case "":
 		simple_implicants = heuristic_method(F, R, column_names);
+		break;
+	default:
+		throw new Exception("NOT A VALID METHOD! CHECK HELP PAGE (--help)");
 		break;
 	}
 	if (options.budyn_format)
 	{
 		writefln("Uproszczone wyrazenie booleowskie: %s", expression_to_string(
-			simple_implicants));
+				simple_implicants));
 	}
 	else
 	{
 		writefln("Uproszczone wyrazenie booleowskie: %s", simple_implicant_to_string(
-			simple_implicants, column_names));
+				simple_implicants, column_names));
 	}
-	
+
 }
