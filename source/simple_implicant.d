@@ -27,6 +27,7 @@ struct SimpleImplicant
 {
     uint cube;
     uint mask;
+
     bool matches_value(uint v)
     {
         return (cube & mask) == (v & mask);
@@ -82,11 +83,20 @@ W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
 
 alias fast_simple_implicants = memoize!(get_simple_implicant,1000_000);
 
-SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value, char[] column_names)
+/** 
+ * Funkcja wyznaczająca implikanty proste dla kostki K i macierzy blokującej
+ * Params:
+ *   cube = kostka
+ *   block_matrix = macierz blokująca
+ *   max_value = największa wartość maski (należy ustawić na )
+ *   column_names = 
+ * Returns: 
+ */
+SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix,char[] column_names)
 {
     uint mask = 0;
     uint best_mask = 0;
-    max_value = (1 << column_names.length) - 1;
+    uint max_value = (1 << column_names.length) - 1;
 
     SimpleImplicant[][] simple_implicant_ranks = new SimpleImplicant[][0b1 << column_names.length];
 
@@ -120,7 +130,6 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
     {
         if (rank.length != 0)
         {
-            //rank = rank.reverse;
             foreach (SimpleImplicant implicant; rank)
             {
                 returnable ~= implicant;
@@ -129,7 +138,9 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
         }
 
     }
-    assert(returnable.length > 0);
+    if(returnable.length <= 0){
+        throw new Exception("Couldn't find simple implicant. Maybe check your input?");
+    }
     return returnable;
 }
 

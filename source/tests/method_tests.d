@@ -1,5 +1,6 @@
 module tests.method_tests;
 
+
 unittest
 {
     import std.random;
@@ -14,6 +15,7 @@ unittest
     import methods.systemic;
     import simple_implicant;
     import methods.systematic;
+    import methods.greedy;
 
 
     void test_method(SimpleImplicant[] function(uint[], uint[], char[]) tested, string method_name)
@@ -77,10 +79,11 @@ unittest
         writefln("%s | Throughput: %s functions/s | Tested %s ( %s parameter ) functions and averaged %s implicants.",method_name, throughput, number_of_functions_to_test,COLUMNS,(
                     sum_of_final_implicants / NUM_FUNTIONS_TO_TEST));
     }
-
+    test_method(&greedy, "GREEDY");
     test_method(&heuristic_method, "HEURISTIC");
     test_method(&smart_method, "SMART");
     test_method(&minterms, "NONE");
     //test_method(&systemic, "BRUTE FORCE");
-    test_method(&systematic_simple, "HOLY SHITT (<<<<< OMG GUYS)");
+    test_method(&systematic_simple, "SYSTEMATIC (NORMAL)");
+    
 }

@@ -121,8 +121,7 @@ private SimpleImplicant[] get_base_simple_implicants(uint[] F,uint[] R,char[] co
 
     foreach (uint cube; F)
     {
-        simple_implciants ~= get_simple_implicant(cube, generate_block_matrix(cube, R), (
-                1 << column_names.length) - 1, column_names);
+        simple_implciants ~= get_simple_implicant(cube, generate_block_matrix(cube, R), column_names);
     }
     return simple_implciants;
 }

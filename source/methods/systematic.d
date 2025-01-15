@@ -21,10 +21,9 @@ SimpleImplicant[] systematic_simple(uint[] F, uint[] R, char[] column_names)
 SimpleImplicant[][] systematic(uint[] F, uint[] R, char[] column_names)
 {
     SimpleImplicant[] implicants = [];
-    uint mask = cast(uint)(1 << column_names.length) - 1;
     foreach (uint cube; F)
     {
-        implicants ~= get_simple_implicant(cube, generate_block_matrix(cube, R), mask, column_names);
+        implicants ~= get_simple_implicant(cube, generate_block_matrix(cube, R), column_names);
     }
     SimpleImplicant[] temp = [];
     foreach (SimpleImplicant a; implicants)
@@ -45,6 +44,10 @@ SimpleImplicant[][] systematic(uint[] F, uint[] R, char[] column_names)
     }
     implicants = temp;
 
+    if(implicants.length > 63){
+        throw new Exception("More than 64 implicants found. Can't fit into matrix. Please use a different method!");
+    }
+
     ulong[] implicant_matrix = new ulong[F.length];
     for (int implicant_index; implicant_index < implicants.length; implicant_index++)
     {
@@ -54,13 +57,14 @@ SimpleImplicant[][] systematic(uint[] F, uint[] R, char[] column_names)
             uint cube = F[i];
             if (implicant.matches_value(cube))
             {
-                implicant_matrix[i] = implicant_matrix[i] | (safe_shift_left(1L, cast(ubyte) implicant_index));
+                
+                implicant_matrix[i] = implicant_matrix[i] | (long_safe_shift_left(1L, cast(ubyte) implicant_index));
             }
         }
     }
 
     ulong implicant_mask = 0;
-    ulong full_set = (safe_shift_left(1, cast(uint) implicants.length)) - 1;
+    ulong full_set = (long_safe_shift_left(1L, cast(uint) implicants.length)) - 1;
     ulong best_mask = full_set;
     ulong[] all_masks = [];
     bool found_good = false;

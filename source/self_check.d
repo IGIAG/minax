@@ -4,7 +4,7 @@ import simple_implicant;
 
 import misc;
 
-void verify_expression(uint[] F, uint[] R,char[] column_names,SimpleImplicant[] r1)
+void verify_expression(uint[] F, uint[] R, char[] column_names, SimpleImplicant[] r1)
 {
     TruthTable truth_table = TruthTable(F.dup, R.dup, column_names.dup);
     ulong offsets_length = truth_table.off_set.length;
@@ -12,7 +12,13 @@ void verify_expression(uint[] F, uint[] R,char[] column_names,SimpleImplicant[] 
     {
         truth_table.on_set = remove_values_matching_simple_implicant(truth_table.on_set, implicant);
         truth_table.off_set = remove_values_matching_simple_implicant(truth_table.off_set, implicant);
-        assert(truth_table.off_set.length == offsets_length);
+        if (truth_table.off_set.length != offsets_length)
+        {
+            throw new Exception("Expression verification failed! (self_check.d)");
+        }
     }
-    assert(truth_table.on_set.length == 0);
+    if (truth_table.on_set.length != 0)
+    {
+        throw new Exception("Expression verification failed! (self_check.d)");
+    }
 }

@@ -8,7 +8,7 @@ string expression_to_string(SimpleImplicant[] implicants){
     string output = "";
     output ~= implicant_to_string(implicants[0]);
     implicants = implicants[1..implicants.length];
-
+    
 
     foreach (SimpleImplicant implicant; implicants)
     {

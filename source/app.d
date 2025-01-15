@@ -10,7 +10,9 @@ import methods.none;
 import darg;
 import state;
 import methods.systematic;
+import methods.greedy;
 import formatters.budyns;
+import consolecolors;
 
 import misc;
 
@@ -40,7 +42,16 @@ struct Options
 immutable usage = usageString!Options("minax");
 immutable help = helpString!Options;
 
-void main(string[] args)
+void main(string[] args){
+	try{
+		_main(args);
+	}
+	catch(Exception ex){
+		cwritefln("<lred>ERROR</lred> %s",ex.message);
+	}
+}
+
+void _main(string[] args)
 {
 
 	writeln(import("intro.txt"));
@@ -87,6 +98,9 @@ void main(string[] args)
 	case "NONE":
 		simple_implicants = minterms(F, R, column_names);
 		break;
+	case "GREEDY":
+		simple_implicants = greedy(F, R, column_names);
+		break;
 	case "BRUTE":
 		if (options.show_progress)
 		{
@@ -100,20 +114,30 @@ void main(string[] args)
 		writefln("Rozwiązania");
 		foreach (SimpleImplicant[] key; results)
 		{
-			if(options.budyn_format){
-				writefln("%s",expression_to_string(key));
+			if (options.budyn_format)
+			{
+				writefln("%s", expression_to_string(key));
 			}
-			else {
-				writefln("%s",simple_implicant_to_string(key,column_names));
+			else
+			{
+				writefln("%s", simple_implicant_to_string(key, column_names));
 			}
-			
+
 		}
 		return;
 	default:
 		simple_implicants = heuristic_method(F, R, column_names);
 		break;
 	}
-
-	writefln("Uproszczone wyrazenie booleowskie: %s", simple_implicant_to_string(
+	if (options.budyn_format)
+	{
+		writefln("Uproszczone wyrazenie booleowskie: %s", expression_to_string(
+			simple_implicants));
+	}
+	else
+	{
+		writefln("Uproszczone wyrazenie booleowskie: %s", simple_implicant_to_string(
 			simple_implicants, column_names));
+	}
+	
 }
