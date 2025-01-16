@@ -1,0 +1,1 @@
+Only for method BRUTE. Caps the number of paths to N. Smaller numbers give better performance. If set, the method is no longer guaranteed to give optimal results.

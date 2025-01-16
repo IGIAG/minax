@@ -1,8 +1,7 @@
 module methods.heuristic;
 
-import simple_implicant;
-
-import block_matrix;
+import binary_matrix_utils.simple_implicant;
+import binary_matrix_utils.block_matrix;
 
 import std.random : randomShuffle;
 
@@ -15,10 +14,9 @@ SimpleImplicant[] heuristic_method(uint[] F,uint[] R,char[] column_names){
 		uint[] block_matrix = generate_block_matrix(cube, R);
 		try
 		{
-			SimpleImplicant cubes_simple_implicant = get_simple_implicant(cube, block_matrix, cast(
-					int)(column_names.length * column_names.length), column_names)[0];
+			SimpleImplicant cubes_simple_implicant = get_simple_implicant(cube, block_matrix,column_names)[0];
 			simple_implicants ~= cubes_simple_implicant;
-			F = simple_implicant.remove_values_matching_simple_implicant(F, cubes_simple_implicant);
+			F = binary_matrix_utils.simple_implicant.remove_values_matching_simple_implicant(F, cubes_simple_implicant);
 		}
 		catch (Exception e)
 		{
@@ -32,4 +30,3 @@ SimpleImplicant[] heuristic_method(uint[] F,uint[] R,char[] column_names){
 	}
     return simple_implicants;
 }
-

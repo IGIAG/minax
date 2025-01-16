@@ -1,4 +1,4 @@
-module simple_implicant;
+module binary_matrix_utils.simple_implicant;
 
 import std.format;
 
@@ -27,6 +27,7 @@ struct SimpleImplicant
 {
     uint cube;
     uint mask;
+
     bool matches_value(uint v)
     {
         return (cube & mask) == (v & mask);
@@ -58,29 +59,36 @@ struct SimpleImplicant
 
         return returnable;
     }
-}
-
-string simple_implicant_to_string(SimpleImplicant[] simple_implicants, char[] column_names)
-{
-    string[] stringed_simple_implicants = [];
-    foreach (SimpleImplicant simple_implicant; simple_implicants)
-    {
-        stringed_simple_implicants ~= simple_implicant.to_string(column_names);
+    bool contains(SimpleImplicant b){
+        return b.mask == mask && (b.cube & b.mask) == (cube & mask);
     }
-    return stringed_simple_implicants.join(" + ");
+    bool opCmp(SimpleImplicant b) const{
+        return cube == b.cube ? mask > b.mask : cube > b.cube;
+    }
 }
-
-/*
-W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
-*/
+/** 
+ * Convers the simple 
+ * Params:
+ *   simple_implicants = 
+ *   column_names = 
+ * Returns: 
+ */
 
 alias fast_simple_implicants = memoize!(get_simple_implicant,1000_000);
 
-SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_value, char[] column_names)
+/** 
+ * Get simple implicants for a given cube, block matrix and column names
+ * Params:
+ *   cube = on-set vector
+ *   block_matrix = block matrix
+ *   column_names = the column names
+ * Returns: Array of simple implicants
+ */
+SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix,char[] column_names)
 {
     uint mask = 0;
     uint best_mask = 0;
-    max_value = (1 << column_names.length) - 1;
+    uint max_value = (1 << column_names.length) - 1;
 
     SimpleImplicant[][] simple_implicant_ranks = new SimpleImplicant[][0b1 << column_names.length];
 
@@ -114,7 +122,6 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
     {
         if (rank.length != 0)
         {
-            //rank = rank.reverse;
             foreach (SimpleImplicant implicant; rank)
             {
                 returnable ~= implicant;
@@ -123,7 +130,9 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix, uint max_
         }
 
     }
-    assert(returnable.length > 0);
+    if(returnable.length <= 0){
+        throw new Exception("Couldn't find simple implicant. Maybe check your input?");
+    }
     return returnable;
 }
 

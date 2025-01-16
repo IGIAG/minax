@@ -1,10 +1,11 @@
 module methods.smart;
 
-import simple_implicant;
+import binary_matrix_utils.simple_implicant;
 
-import misc;
+import binary_matrix_utils.misc;
 
-import block_matrix;
+import binary_matrix_utils.block_matrix;
+
 import std.functional;
 
 alias fast_smart_method = memoize!smart_method;
@@ -15,8 +16,7 @@ SimpleImplicant[] smart_method(uint[] F, uint[] R, char[] column_names)
     uint best_coverage = 0;
     foreach (uint cube; F)
     {
-        SimpleImplicant[] implicants = get_simple_implicant(cube, generate_block_matrix(cube, R), 2 << column_names
-                .length, column_names);
+        SimpleImplicant[] implicants = get_simple_implicant(cube, generate_block_matrix(cube, R), column_names);
         foreach (SimpleImplicant implicant; implicants)
         {
             uint coverage = cast(uint)(F.length - remove_values_matching_simple_implicant(F.dup, implicant)
