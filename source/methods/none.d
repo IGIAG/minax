@@ -1,6 +1,6 @@
 module methods.none;
 
-import simple_implicant;
+import binary_matrix_utils.simple_implicant;
 
 import std.stdio;
 

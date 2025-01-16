@@ -2,8 +2,8 @@ import std.stdio;
 import std.range;
 
 import std.format;
-import simple_implicant;
-import block_matrix;
+import binary_matrix_utils.simple_implicant;
+import binary_matrix_utils.block_matrix;
 import input_output;
 import methods.heuristic;
 import methods.smart;
@@ -13,30 +13,32 @@ import darg;
 import state;
 import methods.systematic;
 import methods.greedy;
+import formatters.standard;
 import formatters.boolean;
 import formatters.budyns;
+import formatters.math;
+import formatters.standard_overline;
 import consolecolors;
-
 import core.exception;
-import misc;
+import binary_matrix_utils.misc;
 
 struct Options
 {
 	@Option("help", "h")
-	@Help("Wyświetla tę wiadomość")
+	@Help("Shows this message.")
 	OptionFlag help;
 
 	@Argument("file", Multiplicity.optional)
-	@Help("Opcjonalna ścieżka do pliku")
+	@Help("Optional - Input file path")
 	string path = "";
 	@Option("method", "m")
 	@Help(generateHelpMethodsList)  //This returns an error
 	string method = "GREEDY";
 	@Option("cap", "c")
-	@Help("Tylko dla metody FULL. Opcjonalny parametr, ogranicza przeszukiwane kombinacje implikantów. Ustawnienie tego parametru neguje systematyczność tej metody ale ma duże zyski wydajnościowe")
+	@Help(import("help/cap_help.txt"))
 	int full_cap = 0;
 	@Option("show-progress", "s")
-	@Help("(Działa tylko dla metody FULL) Wypisuje nr. iteracji oraz ilość znalezionych ścieżek w czasie rzeczywistym.")
+	@Help("Optional - For supported methods, print real-time progress info.")
 	bool show_progress = false;
 	@Option("format", "f")
 	@Help(generateHelpFormattersList)
@@ -45,12 +47,12 @@ struct Options
 
 string generateHelpMethodsList()
 {
-	return format("Opcjonalna metoda do minimalizacji %s", METHOD_MAP.keys);
+	return format("Optional - Method to use. %s", METHOD_MAP.keys);
 }
 
 string generateHelpFormattersList()
 {
-	return format("Zmienia format wyjściowych funkcji. Dostąpne %s", FORMATER_MAP.keys);
+	return format("Optional - Format to use. %s", FORMATER_MAP.keys);
 }
 
 immutable usage = usageString!Options("minax");
@@ -82,9 +84,11 @@ const Method[string] METHOD_MAP = [
 alias Formater = string function(SimpleImplicant[], char[]);
 
 const Formater[string] FORMATER_MAP = [
-	"DEFAULT": &simple_implicant.simple_implicant_to_string, //Standard ( + x')
+	"DEFAULT": &formatters.standard.simple_implicant_to_string, //Standard ( + x')
+	"OVERLINE": &formatters.standard_overline.simple_implicant_to_string, //Standard ( + x‾)
 	"BUDYN": &formatters.budyns.expression_to_string, // ~ +
-	"CODE": &formatters.boolean.expression_to_string // && || !
+	"CODE": &formatters.boolean.expression_to_string, // && || !
+	"MATH": &formatters.math.expression_to_string // && || !
 ];
 
 SimpleImplicant[][] wrap1DFunction(alias func)(uint[] F, uint[] R, char[] column_names)
@@ -153,10 +157,24 @@ void _main(string[] args)
 
 	SimpleImplicant[][] solutions = method(F, R, column_names);
 
+	SimpleImplicant[] cheapest = solutions[0];
+
+	import cost;
+
 	writefln("Solutions:");
 	foreach (SimpleImplicant[] key; solutions)
 	{
 		writefln("%s", formater(key, column_names));
+		if(expression_cost(key,column_names) < expression_cost(cheapest,column_names)){
+			cheapest = key;
+		}
 	}
+	if(solutions.length != 1){
+		cwritefln("<lgreen>CHEAPEST</lgreen> %s", formater(cheapest, column_names));
+	}
+	
+	
+
+
 
 }

@@ -1,8 +1,10 @@
-module misc;
+module binary_matrix_utils.misc;
+
 import std.format;
 import std.random;
-import simple_implicant;
 import std.stdio;
+
+import binary_matrix_utils.simple_implicant;
 
 struct TruthTable
 {
@@ -11,6 +13,13 @@ struct TruthTable
     char[] column_names;
 }
 
+/** 
+ * Generates a random truth table with a given seed and columns
+ * Params:
+ *   seed = seed to use
+ *   columns = parameter count
+ * Returns: 
+ */
 TruthTable get_random_truth_table(int seed,int columns)
 {
     auto rnd = MinstdRand0(seed);
@@ -31,7 +40,13 @@ TruthTable get_random_truth_table(int seed,int columns)
     }
     return TruthTable(F,R,column_names);
 }
-
+/** 
+ * Safe version of a << amount . Throws exception if a bit overflows.
+ * Params:
+ *   a = 
+ *   amount = 
+ * Returns: 
+ */
 uint safe_shift_left(uint a,ubyte amount){
     uint r = a << amount;
     if(r <= a && amount != 0){
@@ -39,7 +54,13 @@ uint safe_shift_left(uint a,ubyte amount){
     }
     return r;
 }
-
+/** 
+ * Safe version of a << amount . Throws exception if a bit overflows.
+ * Params:
+ *   a = 
+ *   amount = 
+ * Returns: 
+ */
 ulong long_safe_shift_left(ulong a,uint amount){
     ulong r = a << amount;
     

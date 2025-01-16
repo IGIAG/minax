@@ -1,10 +1,11 @@
 module methods.smart;
 
-import simple_implicant;
+import binary_matrix_utils.simple_implicant;
 
-import misc;
+import binary_matrix_utils.misc;
 
-import block_matrix;
+import binary_matrix_utils.block_matrix;
+
 import std.functional;
 
 alias fast_smart_method = memoize!smart_method;

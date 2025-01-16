@@ -1,2 +1,2 @@
-MINAX - Program do minimalizacji funkcji boolewskich
+MINAX - Simple program for minimizing truth tables.
 Copyright (C) 2024 Krzysztof Kubicz CC-BY-SA 4.0

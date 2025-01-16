@@ -1,15 +1,16 @@
 module methods.greedy;
-import simple_implicant;
+import binary_matrix_utils.simple_implicant;
 import methods.smart;
-import block_matrix;
+import binary_matrix_utils.block_matrix;
 import std.stdio;
 import core.bitop;
-import misc;
+import binary_matrix_utils.misc;
 import self_check;
 import std.digest.crc;
 import std.algorithm : canFind;
 import std.algorithm.sorting;
 import state;
+import cost;
 
 SimpleImplicant[] greedy(uint[] F, uint[] R, char[] column_names)
 {
@@ -48,6 +49,11 @@ SimpleImplicant[] greedy(uint[] F, uint[] R, char[] column_names)
         {
             uint[] left_after_test = remove_values_matching_simple_implicant(F_remaining.dup,test);
             if(left_after_test.length < F_remaining_after_this_pass.length){
+                best_implicant = test;
+                F_remaining_after_this_pass = left_after_test;
+            }
+            else if(left_after_test.length == F_remaining_after_this_pass.length && 
+            expression_cost([test],column_names) < expression_cost([best_implicant],column_names)){
                 best_implicant = test;
                 F_remaining_after_this_pass = left_after_test;
             }

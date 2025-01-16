@@ -1,4 +1,4 @@
-module formatters.boolean;
+module formatters.math;
 
 import binary_matrix_utils.simple_implicant;
 
@@ -14,7 +14,7 @@ string expression_to_string(SimpleImplicant[] implicants,char[] column_names){
 
     foreach (SimpleImplicant implicant; implicants)
     {
-        output ~= " || ";
+        output ~= " ∨ ";
         output ~= implicant_to_string(implicant,column_names);
 
     }
@@ -34,7 +34,7 @@ private string implicant_to_string(SimpleImplicant implicant,char[] column_names
             if ((implicant.cube >> shiftR) % 2 == 0)
             {
                 
-                returnable ~= format(" !%s ",column_names[$ - shiftR - 1]);
+                returnable ~= format(" ¬%s ",column_names[$ - shiftR - 1]);
             }
             else
             {
@@ -42,7 +42,7 @@ private string implicant_to_string(SimpleImplicant implicant,char[] column_names
                 returnable ~= format(" %s ",column_names[$ - shiftR - 1]);
             }
             if(popcnt(implicant.mask >> shiftR + 1) > 0){
-                returnable ~= "&&";
+                returnable ~= "∧";
             }
 
             shiftR++;

@@ -2,7 +2,13 @@ module combinations;
 
 import std.stdio;
 
-
+/** 
+ * Generates all combinations of N bit numbers with K bits set to 1
+ * Params:
+ *   bits_allowed = The mask of bits allowed, Ex. if N=3 bits_allowed = 0b111
+ *   bits_set = K
+ * Returns: 
+ */
 ulong[] binary_combinations(ulong bits_allowed,ulong bits_set){
 
 	ulong[] array = [];
@@ -31,7 +37,7 @@ ulong[] binary_combinations(ulong bits_allowed,ulong bits_set){
 	return returnable;
 }
 
-T[][] combinations(T)(T[] array, size_t k) {
+private T[][] combinations(T)(T[] array, size_t k) {
     T[][] result;
 
     void helper(T[] currentCombination, size_t start) {

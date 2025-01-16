@@ -8,12 +8,12 @@ unittest
     import std.format;
     import std.datetime.stopwatch;
     import tests.test_constants;
-    import misc;
+    import binary_matrix_utils.misc;
     import methods.heuristic;
     import methods.smart;
     import methods.none;
     import methods.systemic;
-    import simple_implicant;
+    import binary_matrix_utils.simple_implicant;
     import methods.systematic;
     import methods.greedy;
 
@@ -66,8 +66,6 @@ unittest
             sw.stop();
             if(simple_implicants.length > simple_implicants_2.length){
                 writeln(truth_table);
-                writeln(simple_implicant_to_string(simple_implicants,['a','b','c','d']));
-                writeln(simple_implicant_to_string(simple_implicants_2,['a','b','c','d']));
                 assert(false);
             }
         }

@@ -1,8 +1,8 @@
 module self_check;
 
-import simple_implicant;
+import binary_matrix_utils.simple_implicant;
 
-import misc;
+import binary_matrix_utils.misc;
 
 void verify_expression(uint[] F, uint[] R, char[] column_names, SimpleImplicant[] r1)
 {

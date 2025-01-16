@@ -1,10 +1,10 @@
 module methods.systematic;
-import simple_implicant;
+import binary_matrix_utils.simple_implicant;
 import methods.smart;
-import block_matrix;
+import binary_matrix_utils.block_matrix;
 import std.stdio;
 import core.bitop;
-import misc;
+import binary_matrix_utils.misc;
 import self_check;
 import std.digest.crc;
 import std.algorithm : canFind;

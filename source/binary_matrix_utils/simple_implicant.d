@@ -1,4 +1,4 @@
-module simple_implicant;
+module binary_matrix_utils.simple_implicant;
 
 import std.format;
 
@@ -62,35 +62,27 @@ struct SimpleImplicant
     bool contains(SimpleImplicant b){
         return b.mask == mask && (b.cube & b.mask) == (cube & mask);
     }
-    bool opCmp(SimpleImplicant b){
+    bool opCmp(SimpleImplicant b) const{
         return cube == b.cube ? mask > b.mask : cube > b.cube;
     }
 }
-
-string simple_implicant_to_string(SimpleImplicant[] simple_implicants, char[] column_names)
-{
-    string[] stringed_simple_implicants = [];
-    foreach (SimpleImplicant simple_implicant; simple_implicants)
-    {
-        stringed_simple_implicants ~= simple_implicant.to_string(column_names);
-    }
-    return stringed_simple_implicants.join(" + ");
-}
-
-/*
-W mojej skromnej opinii ta funkcja jest trochę brzydka ale robi co musi.
-*/
+/** 
+ * Convers the simple 
+ * Params:
+ *   simple_implicants = 
+ *   column_names = 
+ * Returns: 
+ */
 
 alias fast_simple_implicants = memoize!(get_simple_implicant,1000_000);
 
 /** 
- * Funkcja wyznaczająca implikanty proste dla kostki K i macierzy blokującej
+ * Get simple implicants for a given cube, block matrix and column names
  * Params:
- *   cube = kostka
- *   block_matrix = macierz blokująca
- *   max_value = największa wartość maski (należy ustawić na )
- *   column_names = 
- * Returns: 
+ *   cube = on-set vector
+ *   block_matrix = block matrix
+ *   column_names = the column names
+ * Returns: Array of simple implicants
  */
 SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix,char[] column_names)
 {
