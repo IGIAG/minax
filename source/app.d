@@ -1,5 +1,7 @@
 import std.stdio;
 import std.range;
+
+import std.format;
 import simple_implicant;
 import block_matrix;
 import input_output;
@@ -11,9 +13,11 @@ import darg;
 import state;
 import methods.systematic;
 import methods.greedy;
+import formatters.boolean;
 import formatters.budyns;
 import consolecolors;
 
+import core.exception;
 import misc;
 
 struct Options
@@ -26,7 +30,7 @@ struct Options
 	@Help("Opcjonalna ścieżka do pliku")
 	string path = "";
 	@Option("method", "m")
-	@Help("Opcjonalna metoda do minimalizacji (HEURISTIC,SMART,NONE,GREEDY,BRUTE,SYSTEMATIC)")
+	@Help(generateHelpMethodsList)  //This returns an error
 	string method = "GREEDY";
 	@Option("cap", "c")
 	@Help("Tylko dla metody FULL. Opcjonalny parametr, ogranicza przeszukiwane kombinacje implikantów. Ustawnienie tego parametru neguje systematyczność tej metody ale ma duże zyski wydajnościowe")
@@ -34,9 +38,19 @@ struct Options
 	@Option("show-progress", "s")
 	@Help("(Działa tylko dla metody FULL) Wypisuje nr. iteracji oraz ilość znalezionych ścieżek w czasie rzeczywistym.")
 	bool show_progress = false;
-	@Option("budyn-format", "b")
-	bool budyn_format = false;
+	@Option("format", "f")
+	@Help(generateHelpFormattersList)
+	string format = "DEFAULT";
+}
 
+string generateHelpMethodsList()
+{
+	return format("Opcjonalna metoda do minimalizacji %s", METHOD_MAP.keys);
+}
+
+string generateHelpFormattersList()
+{
+	return format("Zmienia format wyjściowych funkcji. Dostąpne %s", FORMATER_MAP.keys);
 }
 
 immutable usage = usageString!Options("minax");
@@ -54,11 +68,34 @@ void main(string[] args)
 	}
 }
 
+alias Method = SimpleImplicant[][]function(uint[], uint[], char[]);
+
+const Method[string] METHOD_MAP = [
+	"SMART": &wrap1DFunction!smart_method,
+	"HEURISTIC": &wrap1DFunction!heuristic_method,
+	"NONE": &wrap1DFunction!minterms,
+	"GREEDY": &wrap1DFunction!greedy,
+	"BRUTE": &wrap1DFunction!systemic,
+	"SYSTEMATIC": &systematic
+];
+
+alias Formater = string function(SimpleImplicant[], char[]);
+
+const Formater[string] FORMATER_MAP = [
+	"DEFAULT": &simple_implicant.simple_implicant_to_string, //Standard ( + x')
+	"BUDYN": &formatters.budyns.expression_to_string, // ~ +
+	"CODE": &formatters.boolean.expression_to_string // && || !
+];
+
+SimpleImplicant[][] wrap1DFunction(alias func)(uint[] F, uint[] R, char[] column_names)
+{
+	return [func(F, R, column_names)];
+}
+
 void _main(string[] args)
 {
 
 	writeln(import("intro.txt"));
-	
 
 	Options options;
 
@@ -78,9 +115,33 @@ void _main(string[] args)
 		write(help);
 		return;
 	}
+	Method method;
+	try{
+		method = METHOD_MAP[options.method];
+	}
+	catch(RangeError err){
+		writeln("Metoda nie zdefiniowana (--help)");
+		return;
+	}
+
+	Formater formater;
+	try{
+		formater = FORMATER_MAP[options.format];
+	}
+	catch(RangeError err){
+		writeln("Format nie zdefiniowany (--help)");
+		return;
+	}
+
+	if (options.show_progress)
+	{
+		SHOW_PROGRESS = true;
+	}
+
 	char[] column_names = [];
 	uint[] F = [];
 	uint[] R = [];
+
 	if (options.path == "")
 	{
 		input_output.read_from_input(column_names, F, R);
@@ -89,61 +150,13 @@ void _main(string[] args)
 	{
 		input_output.read_from_file(options.path, column_names, F, R);
 	}
-	SimpleImplicant[] simple_implicants;
-	switch (options.method)
-	{
-	case "SMART":
-		simple_implicants = smart_method(F, R, column_names);
-		break;
-	case "HEURISTIC":
-		simple_implicants = heuristic_method(F, R, column_names);
-		break;
-	case "NONE":
-		simple_implicants = minterms(F, R, column_names);
-		break;
-	case "GREEDY":
-		simple_implicants = greedy(F, R, column_names);
-		break;
-	case "BRUTE":
-		if (options.show_progress)
-		{
-			SHOW_PROGRESS = true;
-		}
-		state.FULL_CAP = options.full_cap;
-		simple_implicants = systemic(F, R, column_names);
-		break;
-	case "SYSTEMATIC":
-		SimpleImplicant[][] results = systematic(F, R, column_names);
-		writefln("Rozwiązania");
-		foreach (SimpleImplicant[] key; results)
-		{
-			if (options.budyn_format)
-			{
-				writefln("%s", expression_to_string(key));
-			}
-			else
-			{
-				writefln("%s", simple_implicant_to_string(key, column_names));
-			}
 
-		}
-		return;
-	case "":
-		simple_implicants = heuristic_method(F, R, column_names);
-		break;
-	default:
-		throw new Exception("NOT A VALID METHOD! CHECK HELP PAGE (--help)");
-		break;
-	}
-	if (options.budyn_format)
+	SimpleImplicant[][] solutions = method(F, R, column_names);
+
+	writefln("Solutions:");
+	foreach (SimpleImplicant[] key; solutions)
 	{
-		writefln("Uproszczone wyrazenie booleowskie: %s", expression_to_string(
-				simple_implicants));
-	}
-	else
-	{
-		writefln("Uproszczone wyrazenie booleowskie: %s", simple_implicant_to_string(
-				simple_implicants, column_names));
+		writefln("%s", formater(key, column_names));
 	}
 
 }

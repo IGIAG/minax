@@ -1,26 +1,28 @@
-module formatters.budyns;
+module formatters.boolean;
 
 import simple_implicant;
 
 import std.format;
 
+import core.bitop;
+
 string expression_to_string(SimpleImplicant[] implicants,char[] column_names){
     string output = "";
-    output ~= implicant_to_string(implicants[0]);
+    output ~= implicant_to_string(implicants[0],column_names);
     implicants = implicants[1..implicants.length];
     
 
     foreach (SimpleImplicant implicant; implicants)
     {
-        output ~= " + ";
-        output ~= implicant_to_string(implicant);
+        output ~= " || ";
+        output ~= implicant_to_string(implicant,column_names);
 
     }
     return output;
 }
-private string implicant_to_string(SimpleImplicant implicant)
+private string implicant_to_string(SimpleImplicant implicant,char[] column_names)
     {
-        string returnable = "";
+        string returnable = "(";
         uint shiftR = 0;
         while (shiftR < 32)
         {
@@ -31,15 +33,20 @@ private string implicant_to_string(SimpleImplicant implicant)
             }
             if ((implicant.cube >> shiftR) % 2 == 0)
             {
-                returnable ~= format("~x%s",shiftR);
+                
+                returnable ~= format(" !%s ",column_names[shiftR]);
             }
             else
             {
-                returnable ~= format("x%s",shiftR);
+                
+                returnable ~= format(" %s ",column_names[shiftR]);
+            }
+            if(popcnt(implicant.mask >> shiftR + 1) > 0){
+                returnable ~= "&&";
             }
 
             shiftR++;
         }
 
-        return returnable;
+        return returnable ~ ")";
     }
