@@ -145,6 +145,10 @@ void _main(string[] args)
 	{
 		SHOW_PROGRESS = true;
 	}
+	if (options.visualization == OptionFlag.yes)
+	{
+		VISUALISE_ALL = true;
+	}
 
 	char[] column_names = [];
 	uint[] F = [];
@@ -181,7 +185,7 @@ void _main(string[] args)
 		}
 	}
 	if(solutions.length != 1){
-		cwritefln("<lgreen>CHEAPEST</lgreen> %s", formater(cheapest, column_names));
+		cwritefln("<lgreen>CHEAPEST</lgreen> %s", formater(cheapest, column_names).replace("&","&amp;"));
 	}
 	
 	

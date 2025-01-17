@@ -25,6 +25,9 @@ SimpleImplicant[][] systematic(uint[] F, uint[] R, char[] column_names)
     {
         implicants ~= get_simple_implicant(cube, generate_block_matrix(cube, R), column_names);
     }
+
+    
+
     SimpleImplicant[] temp = [];
     foreach (SimpleImplicant a; implicants)
     {
@@ -43,6 +46,7 @@ SimpleImplicant[][] systematic(uint[] F, uint[] R, char[] column_names)
         }
     }
     implicants = temp;
+    
 
     if(implicants.length > 63){
         throw new Exception("More than 64 implicants found. Can't fit into matrix. Please use a different method!");
@@ -61,6 +65,13 @@ SimpleImplicant[][] systematic(uint[] F, uint[] R, char[] column_names)
                 implicant_matrix[i] = implicant_matrix[i] | (long_safe_shift_left(1L, cast(ubyte) implicant_index));
             }
         }
+    }
+
+    if(state.VISUALISE_ALL){
+        import std.stdio;
+        writeln("THIS IS FOR ALL IMPLICANTS: ");
+        import visualization.implicant_coverage;
+        render_coverage(implicants,F,column_names);
     }
 
     ulong implicant_mask = 0;

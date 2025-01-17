@@ -10,15 +10,15 @@ void render_coverage(SimpleImplicant[] implicants,uint[] F,char[] column_names){
     import consolecolors;
     import std.range : padLeft;
     import std.format;
+
     string[SimpleImplicant] color_map;
-    
 
     cwriteln("VISUALIZATION:\n");
     cwriteln("Legend:\n");
 
     for (int i = 0;i<implicants.length;i++)
     {
-        string color = colors[i % $];
+        string color = colors[(((implicants[i].cube | implicants[i].cube << 16)) ^ ( (implicants[i].mask | implicants[i].mask << 16))) % $];
         color_map[implicants[i]] = color;
         cwritefln("I%s : <on_%s>%s</on_%s>",i,color,implicants[i].to_string(column_names),color);
     }
