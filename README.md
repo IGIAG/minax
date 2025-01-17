@@ -9,8 +9,11 @@
 2. Metodę obliczeń można wybrać parametrem `-m` lub `--method=`. Dostępne metody to:
     - `NONE` - brak minimalizacji, wypisanie mintermów funkcji.
     - `HEURISTIC` (Default) - metoda heurystyczna.
-    - `SMART` - metoda heurystyczna inteligentna. Wybiera implikanty po ilośći pokrywanych kostek.
-    - `FULL` (Eksperymentalna) - metoda systematyczna. Powinna zawsze dawać najbardziej zoptymalizowane wyniki. BARDZO WOLNA!
+    - `SMART` - silly wersja `GREEDY`. Lepiej nie używać.
+    - `SYSTEMATIC` - metoda systematyczna. Daje najbardziej zoptymalizowane wyniki.
+    - `BRUTE` - silly wersja systematycznej. Lepiej nie użyać.
+    - `GREEDY` - Liczy wszystkie implikanty proste tak jak systematyczna, ale wybiera optymalne algorytmem chciwym. 
+    Jakość wyników : SYSTEMATIC > GREEDY > HEURISTIC > NONE
 3. Aby załadować z pliku należy użyć odpowiedniego formatu. Przykładowy plik znajduje się w repozytorium pod nazwą `testfile.txt`.
     - każda sekcja jest oddzielona pustym wierszem
     - pierwsza linijka pliku wybiera tryb należy tam wpisać `BINARY` lub `DECIMAL` (w trybie decimal podajemy nr. wierszów)
