@@ -104,17 +104,20 @@ SimpleImplicant[] get_simple_implicant(uint cube, uint[] block_matrix,char[] col
         {
             matrix[i] = matrix[i] > 0;
         }
-        uint sum = matrix.length > 0 ? matrix[0] : 0;
-        for (int i = 1; i < matrix.length; i++)
-        {
-            sum = matrix[i] & sum;
-        }
-        if (sum > 0)
-        {
 
-            simple_implicant_ranks[popcnt(mask)] ~= SimpleImplicant(cube, mask);
-
+        bool failed = false;
+        foreach (uint row; matrix)
+        {
+            if(row == 0){
+                failed = true;
+                break;
+            }
         }
+        if(failed){
+            mask++;
+            continue;
+        }
+        simple_implicant_ranks[popcnt(mask)] ~= SimpleImplicant(cube, mask);
         mask++;
     }
     SimpleImplicant[] returnable = [];
