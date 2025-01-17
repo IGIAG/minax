@@ -2,12 +2,16 @@ module visualization.implicant_coverage;
 
 import binary_matrix_utils.simple_implicant;
 
+const string[] colors = ["red",  "green",  "orange",  "blue",  "magenta", "cyan", "lgrey", 
+        "grey", "lred", "lgreen", "yellow", "lblue", "lmagenta", "lcyan"
+    ];
+
 void render_coverage(SimpleImplicant[] implicants,uint[] F,char[] column_names){
     import consolecolors;
     import std.range : padLeft;
     import std.format;
     string[SimpleImplicant] color_map;
-    string[] colors = availableConsoleColors();
+    
 
     cwriteln("VISUALIZATION:\n");
     cwriteln("Legend:\n");
