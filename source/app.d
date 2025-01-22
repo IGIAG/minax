@@ -32,7 +32,7 @@ struct Options
 	@Help("Optional - Input file path")
 	string path = "";
 	@Option("method", "m")
-	@Help(generateHelpMethodsList)  //This returns an error
+	@Help(generateHelpMethodsList)
 	string method = "GREEDY";
 	@Option("cap", "c")
 	@Help(import("help/cap_help.txt"))
@@ -43,6 +43,10 @@ struct Options
 	@Option("format", "f")
 	@Help(generateHelpFormattersList)
 	string format = "DEFAULT";
+
+	@Option("visualization", "v")
+	@Help("Shows a visualization of how implicants cover F (ON-SET)")
+	OptionFlag visualization;
 }
 
 string generateHelpMethodsList()
@@ -141,6 +145,10 @@ void _main(string[] args)
 	{
 		SHOW_PROGRESS = true;
 	}
+	if (options.visualization == OptionFlag.yes)
+	{
+		VISUALISE_ALL = true;
+	}
 
 	char[] column_names = [];
 	uint[] F = [];
@@ -159,18 +167,25 @@ void _main(string[] args)
 
 	SimpleImplicant[] cheapest = solutions[0];
 
-	import cost;
+	
 
 	writefln("Solutions:");
 	foreach (SimpleImplicant[] key; solutions)
 	{
+		import cost;
 		writefln("%s", formater(key, column_names));
 		if(expression_cost(key,column_names) < expression_cost(cheapest,column_names)){
 			cheapest = key;
 		}
+		if(options.visualization == OptionFlag.yes){
+			import visualization.implicant_coverage;
+			writeln();
+    		render_coverage(key,F,column_names);
+			writeln();
+		}
 	}
 	if(solutions.length != 1){
-		cwritefln("<lgreen>CHEAPEST</lgreen> %s", formater(cheapest, column_names));
+		cwritefln("<lgreen>CHEAPEST</lgreen> %s", formater(cheapest, column_names).replace("&","&amp;"));
 	}
 	
 	

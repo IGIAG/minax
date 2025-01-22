@@ -38,6 +38,13 @@ SimpleImplicant[] greedy(uint[] F, uint[] R, char[] column_names)
     }
     implicants = temp;
 
+    if(state.VISUALISE_ALL){
+        import std.stdio;
+        writeln("THIS IS FOR ALL IMPLICANTS: ");
+        import visualization.implicant_coverage;
+        render_coverage(implicants,F,column_names);
+    }
+
     uint[] F_remaining = F.dup;
 
     SimpleImplicant[] returnable = [];
