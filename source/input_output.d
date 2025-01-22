@@ -5,9 +5,11 @@ import std.array;
 import std.conv;
 
 void read_from_input(ref char[] column_names,ref uint[] F,ref uint[] R){
+	writeln("Reading from terminal be default. Use --help for more information.");
+
 	while (true)
 	{
-		writeln("Podaj nazwę kolumny, albo pozostaw pustę aby przejść dalej");
+		writeln("Input column name (1 character). Enter empty line to continue.");
 		string input = readln();
 		if (input == "\n")
 		{
@@ -19,7 +21,7 @@ void read_from_input(ref char[] column_names,ref uint[] F,ref uint[] R){
 	
 	while (true)
 	{
-		writeln("Podaj stan on-set albo nic aby przejsc dalej");
+		writeln("Enter On-Set vector. Enter empty line to continue.");
 		string input = readln();
 		if (input == "\n")
 		{
@@ -30,7 +32,7 @@ void read_from_input(ref char[] column_names,ref uint[] F,ref uint[] R){
 	
 	while (true)
 	{
-		writeln("Podaj stan off-set albo nic aby przejsc dalej");
+		writeln("Enter Off-Set vector. Enter empty line to continue.");
 		string input = readln();
 		if (input == "\n")
 		{
